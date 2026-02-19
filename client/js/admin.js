@@ -261,12 +261,12 @@ function getStatusHTML(status) {
 function getActionButtons(id, status) {
     let html = '<div class="action-btns">';
     if (status !== 'confirmed') {
-        html += `<button class="action-btn action-btn--confirm" onclick="updateReservation(${id}, 'confirmed')" title="Xác nhận">
+        html += `<button class="action-btn action-btn--confirm" onclick="updateReservation('${id}', 'confirmed')" title="Xác nhận">
       <i class="fas fa-check"></i> Xác nhận
     </button>`;
     }
     if (status !== 'cancelled') {
-        html += `<button class="action-btn action-btn--cancel" onclick="updateReservation(${id}, 'cancelled')" title="Hủy">
+        html += `<button class="action-btn action-btn--cancel" onclick="updateReservation('${id}', 'cancelled')" title="Hủy">
       <i class="fas fa-times"></i> Hủy
     </button>`;
     }
@@ -276,7 +276,7 @@ function getActionButtons(id, status) {
     if (status === 'cancelled') {
         html += `<span style="color:#991B1B; font-size:0.8rem; font-weight:600;">✗ Đã hủy</span>`;
     }
-    html += `<button class="action-btn action-btn--delete" onclick="deleteReservation(${id})" title="Xóa" style="background:#FEE2E2;color:#991B1B;margin-left:4px;">
+    html += `<button class="action-btn action-btn--delete" onclick="deleteReservation('${id}')" title="Xóa" style="background:#FEE2E2;color:#991B1B;margin-left:4px;">
       <i class="fas fa-trash-alt"></i>
     </button>`;
     html += '</div>';
@@ -534,7 +534,7 @@ async function loadContacts() {
         <td class="msg-cell" onclick="this.classList.toggle('expanded')" title="Click để xem đầy đủ">${escHTML(c.message)}</td>
         <td>${formatDateTime(c.created_at)}</td>
         <td>
-          <button class="action-btn action-btn--delete" onclick="deleteContact(${c.id})" title="Xóa" style="background:#FEE2E2;color:#991B1B;">
+          <button class="action-btn action-btn--delete" onclick="deleteContact('${c.id}')" title="Xóa" style="background:#FEE2E2;color:#991B1B;">
             <i class="fas fa-trash-alt"></i> Xóa
           </button>
         </td>
@@ -609,13 +609,13 @@ async function loadMenuItems() {
         <td>${m.is_active ? '<span class="status status--confirmed"><i class="fas fa-eye"></i> Hiện</span>' : '<span class="status status--cancelled"><i class="fas fa-eye-slash"></i> Ẩn</span>'}</td>
         <td>
           <div class="action-btns">
-            <button class="action-btn action-btn--confirm" onclick="editMenuItem(${m.id})" title="Sửa">
+            <button class="action-btn action-btn--confirm" onclick="editMenuItem('${m.id}')" title="Sửa">
               <i class="fas fa-edit"></i> Sửa
             </button>
-            <button class="action-btn action-btn--${m.is_active ? 'cancel' : 'confirm'}" onclick="toggleMenuItem(${m.id}, ${m.is_active ? 0 : 1})" title="${m.is_active ? 'Ẩn' : 'Hiện'}">
+            <button class="action-btn action-btn--${m.is_active ? 'cancel' : 'confirm'}" onclick="toggleMenuItem('${m.id}', ${m.is_active ? 0 : 1})" title="${m.is_active ? 'Ẩn' : 'Hiện'}">
               <i class="fas fa-${m.is_active ? 'eye-slash' : 'eye'}"></i> ${m.is_active ? 'Ẩn' : 'Hiện'}
             </button>
-            <button class="action-btn action-btn--delete" onclick="deleteMenuItem(${m.id})" title="Xóa" style="background:#FEE2E2;color:#991B1B;">
+            <button class="action-btn action-btn--delete" onclick="deleteMenuItem('${m.id}')" title="Xóa" style="background:#FEE2E2;color:#991B1B;">
               <i class="fas fa-trash-alt"></i>
             </button>
           </div>
