@@ -14,35 +14,69 @@ let mongoConnected = false;
 let mongoConnectionError = '';
 
 // =====================================================
-// MONGODB CONNECTION (với retry cho Vercel cold start)
+// MONGODB CONNECTION (tối ưu cho Vercel serverless)
+// Cache connection trong global scope để tái sử dụng giữa các invocations
 // =====================================================
 const MONGODB_URI = process.env.MONGODB_URI || '';
+const IS_SERVERLESS = process.env.VERCEL === '1';
 
-async function connectMongoDB(retryCount = 0) {
-    const MAX_RETRIES = 3;
+// Cache connection promise trong global scope (quan trọng cho serverless!)
+// Vercel giữ Lambda warm → biến global được giữ lại → tái sử dụng connection
+let cachedConnection = global._mongoConnection || null;
+
+async function connectMongoDB() {
     if (!MONGODB_URI) {
         mongoConnectionError = 'MONGODB_URI không được cấu hình';
         console.log('⚠️  ' + mongoConnectionError);
         return false;
     }
-    try {
-        // Nếu đã kết nối rồi thì dùng luôn
-        if (mongoose.connection.readyState === 1) {
-            useMongo = true;
-            mongoConnected = true;
-            mongoConnectionError = '';
-            return true;
+
+    // Nếu đã kết nối rồi thì dùng luôn (warm Lambda)
+    if (mongoose.connection.readyState === 1) {
+        useMongo = true;
+        mongoConnected = true;
+        mongoConnectionError = '';
+        console.log('♻️  Tái sử dụng kết nối MongoDB (warm)');
+        return true;
+    }
+
+    // Nếu đang có cached promise (đang kết nối), đợi nó
+    if (cachedConnection) {
+        console.log('⏳ Đang chờ kết nối MongoDB cached...');
+        try {
+            await cachedConnection;
+            if (mongoose.connection.readyState === 1) {
+                useMongo = true;
+                mongoConnected = true;
+                return true;
+            }
+        } catch {
+            cachedConnection = null;
+            global._mongoConnection = null;
         }
+    }
 
-        console.log(`🔌 Đang kết nối MongoDB... (lần ${retryCount + 1}/${MAX_RETRIES + 1})`);
+    try {
+        console.log('🔌 Tạo kết nối MongoDB mới...');
 
-        await mongoose.connect(MONGODB_URI, {
-            serverSelectionTimeoutMS: 15000,  // 15s cho Vercel cold start
-            socketTimeoutMS: 45000,
-            connectTimeoutMS: 15000,
-            maxPoolSize: 5,                   // Giới hạn pool cho serverless
-            minPoolSize: 1,
-        });
+        // Cấu hình tối ưu cho serverless:
+        // - maxPoolSize: 1 để giảm tối đa số connections  
+        // - minPoolSize: 0 để không giữ connection idle
+        const connectOptions = {
+            serverSelectionTimeoutMS: IS_SERVERLESS ? 8000 : 15000,
+            socketTimeoutMS: 30000,
+            connectTimeoutMS: IS_SERVERLESS ? 8000 : 15000,
+            maxPoolSize: 1,       // CHỈ 1 connection per Lambda instance
+            minPoolSize: 0,       // Không giữ connection idle
+            maxIdleTimeMS: 10000, // Đóng connection idle sau 10s
+            bufferCommands: true,
+        };
+
+        // Cache promise để các request đồng thời dùng chung
+        cachedConnection = mongoose.connect(MONGODB_URI, connectOptions);
+        global._mongoConnection = cachedConnection;
+
+        await cachedConnection;
 
         console.log('✅ Kết nối MongoDB thành công!');
         useMongo = true;
@@ -55,19 +89,11 @@ async function connectMongoDB(retryCount = 0) {
         return true;
     } catch (error) {
         mongoConnectionError = error.message;
-        console.error(`❌ Lỗi kết nối MongoDB (lần ${retryCount + 1}):`, error.message);
-
-        // Retry logic
-        if (retryCount < MAX_RETRIES) {
-            const delay = (retryCount + 1) * 2000; // 2s, 4s, 6s
-            console.log(`⏳ Thử lại sau ${delay / 1000}s...`);
-            await new Promise(r => setTimeout(r, delay));
-            return connectMongoDB(retryCount + 1);
-        }
-
-        console.error('❌ Đã thử', MAX_RETRIES + 1, 'lần - MongoDB không kết nối được');
+        console.error('❌ Lỗi kết nối MongoDB:', error.message);
         useMongo = false;
         mongoConnected = false;
+        cachedConnection = null;
+        global._mongoConnection = null;
         return false;
     }
 }

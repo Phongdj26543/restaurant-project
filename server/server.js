@@ -120,11 +120,16 @@ const formLimiter = rateLimit({
 // =====================================================
 // WAIT FOR DB CONNECTION (quan trọng cho Vercel cold start)
 // Đảm bảo MongoDB đã kết nối trước khi xử lý API request
+// Timeout sau 9s để không bị Vercel function timeout (10s limit)
 // =====================================================
 app.use('/api', async (req, res, next) => {
     if (!dbInitDone && dbReadyPromise) {
         try {
-            await dbReadyPromise;
+            // Đặt timeout 9s để không vượt quá Vercel function limit
+            const timeoutPromise = new Promise((_, reject) =>
+                setTimeout(() => reject(new Error('DB wait timeout')), 9000)
+            );
+            await Promise.race([dbReadyPromise, timeoutPromise]);
         } catch (e) {
             console.error('DB connection wait error:', e.message);
         }
