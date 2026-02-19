@@ -1206,7 +1206,6 @@ function showVideoIntro(videoUrl, startMuted) {
     const controls = document.getElementById('heroVideoControls');
     const skipBtn = document.getElementById('heroVideoSkip');
     const muteBtn = document.getElementById('heroVideoMute');
-    const soundOverlay = document.getElementById('videoSoundOverlay');
     const hero = document.querySelector('.hero');
 
     if (!heroVideo || !hero) return;
@@ -1214,7 +1213,7 @@ function showVideoIntro(videoUrl, startMuted) {
     heroVideo.src = videoUrl;
     heroVideo.loop = true;
     heroVideo.preload = 'auto';
-    heroVideo.muted = false; // Thử phát có âm thanh
+    heroVideo.muted = false;
     updateMuteIcon(muteBtn, false);
     heroVideo.load();
 
@@ -1225,36 +1224,39 @@ function showVideoIntro(videoUrl, startMuted) {
         if (controls) controls.style.display = 'flex';
     }
 
+    // Tự động bật âm thanh khi user tương tác bất kỳ với trang
+    function enableSoundOnInteraction() {
+        if (heroVideo && heroVideo.muted && heroVideo.classList.contains('active')) {
+            heroVideo.muted = false;
+            updateMuteIcon(muteBtn, false);
+            if (heroVideo.paused) heroVideo.play().catch(() => { });
+        }
+        // Gỡ tất cả listener sau khi đã bật âm thanh
+        ['click', 'touchstart', 'scroll', 'keydown'].forEach(evt => {
+            document.removeEventListener(evt, enableSoundOnInteraction, { capture: true });
+        });
+    }
+
     heroVideo.addEventListener('canplay', () => {
         showControls();
-        // Thử phát có âm thanh trước
         heroVideo.muted = false;
         const playPromise = heroVideo.play();
         if (playPromise !== undefined) {
             playPromise.then(() => {
                 // Phát có âm thanh thành công!
                 updateMuteIcon(muteBtn, false);
-                if (soundOverlay) soundOverlay.style.display = 'none';
             }).catch(() => {
-                // Trình duyệt chặn autoplay có âm -> phát muted + hiện overlay
+                // Trình duyệt chặn autoplay có âm -> phát muted trước
                 heroVideo.muted = true;
                 updateMuteIcon(muteBtn, true);
                 heroVideo.play().catch(() => { });
-                // Hiện overlay để user click bật âm thanh
-                if (soundOverlay) soundOverlay.style.display = 'flex';
+                // Tự động bật âm thanh ngay khi user tương tác với trang
+                ['click', 'touchstart', 'scroll', 'keydown'].forEach(evt => {
+                    document.addEventListener(evt, enableSoundOnInteraction, { capture: true, once: true });
+                });
             });
         }
     }, { once: true });
-
-    // Click vào overlay = bật âm thanh
-    if (soundOverlay) {
-        soundOverlay.addEventListener('click', () => {
-            heroVideo.muted = false;
-            updateMuteIcon(muteBtn, false);
-            if (heroVideo.paused) heroVideo.play().catch(() => { });
-            soundOverlay.style.display = 'none';
-        });
-    }
 
     // Khi quay lại tab/app -> tự động phát lại video
     document.addEventListener('visibilitychange', () => {
@@ -1281,7 +1283,6 @@ function showVideoIntro(videoUrl, startMuted) {
         heroVideo.classList.add('fading');
         hero.classList.remove('hero--video-playing');
         if (controls) controls.style.display = 'none';
-        if (soundOverlay) soundOverlay.style.display = 'none';
         setTimeout(() => {
             heroVideo.pause();
             heroVideo.classList.remove('active', 'fading');
@@ -1299,7 +1300,6 @@ function showVideoIntro(videoUrl, startMuted) {
                     updateMuteIcon(muteBtn, true);
                 });
             }
-            if (soundOverlay) soundOverlay.style.display = 'none';
         });
     }
 
