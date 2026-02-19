@@ -124,6 +124,8 @@ body {
     background-color: var(--color-dark);
     line-height: 1.7;
     overflow-x: hidden;
+    width: 100%;
+    min-width: 0;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
@@ -139,7 +141,11 @@ a {
     transition: var(--transition);
 }
 
-img {
+img,
+video,
+iframe,
+embed,
+object {
     max-width: 100%;
     height: auto;
     display: block;
@@ -165,8 +171,10 @@ textarea {
 
 .container {
     max-width: var(--max-width);
+    width: 100%;
     margin: 0 auto;
     padding: 0 var(--space-lg);
+    box-sizing: border-box;
 }
 
 h1,
@@ -802,7 +810,7 @@ h4 {
 
 .about-image {
     position: relative;
-    overflow: visible;
+    overflow: hidden;
 }
 
 .about-image::before {
@@ -986,7 +994,7 @@ h4 {
 
 .menu-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr));
     gap: var(--space-xl);
 }
 
@@ -2311,7 +2319,7 @@ h4 {
     z-index: 3000;
     transform: translateX(120%);
     transition: transform 0.4s ease;
-    max-width: 380px;
+    max-width: calc(100vw - 40px);
     box-shadow: var(--shadow-xl);
     backdrop-filter: blur(20px);
     border: 1px solid rgba(212, 175, 55, 0.15);
@@ -2801,10 +2809,198 @@ h4 {
         width: 100%;
         justify-content: center;
     }
+
+    /* GLOBAL MOBILE OVERFLOW FIX */
+    .section,
+    .container,
+    .hero,
+    .about,
+    .menu-section,
+    .gallery-section,
+    .reservation-section,
+    .contact-section,
+    .stats-section,
+    .testimonials-section,
+    .offer-banner,
+    .footer {
+        overflow-x: hidden;
+        max-width: 100vw;
+    }
+
+    /* FIX about-image decorative elements overflow */
+    .about-image::before {
+        left: 0;
+        top: 0;
+        right: 0;
+        bottom: 0;
+    }
+
+    .about-badge {
+        right: 10px;
+        bottom: 10px;
+        padding: 14px 18px;
+    }
+
+    .badge-number {
+        font-size: 1.8rem;
+    }
+
+    .badge-text {
+        font-size: 0.6rem;
+        letter-spacing: 2px;
+    }
+
+    /* FIX hero text overflow */
+    .hero-title,
+    .section-title,
+    .offer-title {
+        word-break: break-word;
+        overflow-wrap: break-word;
+        hyphens: auto;
+    }
+
+    .hero-content {
+        padding: 0 16px;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+
+    /* FIX background-attachment: fixed (broken on iOS) */
+    .stats-section,
+    .reservation-section,
+    .offer-banner {
+        background-attachment: scroll !important;
+    }
+
+    /* FIX contact map iframe overflow */
+    .contact-map {
+        width: 100%;
+        overflow: hidden;
+    }
+
+    .contact-map iframe {
+        width: 100% !important;
+        max-width: 100%;
+    }
+
+    /* FIX footer content overflow */
+    .footer-contact p {
+        word-break: break-word;
+        overflow-wrap: break-word;
+    }
+
+    .footer-hours ul li {
+        font-size: 0.78rem;
+        gap: 8px;
+    }
+
+    /* FIX floating action buttons */
+    .floating-action-btn {
+        white-space: normal;
+        max-width: calc(100vw - 60px);
+    }
+
+    /* FIX reservation form overflow */
+    .reservation-form {
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+
+    /* FIX contact card content overflow */
+    .contact-card {
+        padding: var(--space-lg);
+        word-break: break-word;
+    }
+
+    .contact-form-wrap {
+        padding: var(--space-lg);
+    }
+
+    .contact-item p {
+        word-break: break-all;
+        overflow-wrap: break-word;
+    }
+
+    /* FIX testimonial overflow */
+    .testimonials-carousel {
+        max-width: 100%;
+    }
+
+    .testimonial-card {
+        padding: 0 var(--space-sm);
+        box-sizing: border-box;
+    }
+
+    .testimonial-text {
+        font-size: 0.9rem;
+        line-height: 1.8;
+        word-break: break-word;
+    }
+
+    .testimonial-text::before {
+        font-size: 3rem;
+        top: -20px;
+    }
+
+    /* FIX stats grid on very small screens */
+    .stats-container {
+        padding: 0 8px;
+    }
+
+    .stat-item {
+        padding: var(--space-md) var(--space-xs);
+    }
+
+    /* FIX order section items */
+    .order-item {
+        flex-wrap: wrap;
+    }
+
+    .order-summary {
+        padding: var(--space-md);
+    }
+
+    /* FIX privacy modal mobile */
+    .privacy-modal-content {
+        width: 95%;
+        max-height: 90vh;
+    }
+
+    .privacy-modal-body {
+        padding: 24px 16px;
+    }
+
+    .privacy-modal-body h2 {
+        font-size: 1.3rem;
+    }
+
+    /* FIX cookie consent mobile layout */
+    .cookie-consent {
+        padding: 12px 0;
+    }
+
+    .cookie-content {
+        padding: 0 16px;
+    }
+
+    .cookie-actions {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .cookie-accept,
+    .cookie-decline {
+        width: 100%;
+        text-align: center;
+    }
 }
 
 /* Extra small phones */
 @media (max-width: 380px) {
+    .container {
+        padding: 0 12px;
+    }
+
     .hero-title {
         font-size: 1.6rem;
         letter-spacing: 1px;
@@ -2814,15 +3010,29 @@ h4 {
         font-size: 0.95rem;
     }
 
+    .hero-tagline {
+        font-size: 0.7rem;
+        letter-spacing: 1px;
+    }
+
+    .hero-desc {
+        font-size: 0.8rem;
+    }
+
     .hero-buttons .btn {
-        max-width: 240px;
+        max-width: 100%;
+        width: 100%;
         padding: 12px 24px;
         font-size: 0.7rem;
     }
 
+    .hero-divider::before,
+    .hero-divider::after {
+        width: 30px;
+    }
+
     .menu-card-image {
-        width: 100px;
-        min-width: 100px;
+        height: 160px;
     }
 
     .menu-card-name {
@@ -2839,10 +3049,26 @@ h4 {
 
     .section-title {
         font-size: 1.3rem;
+        letter-spacing: 1px;
+    }
+
+    .section-subtitle {
+        font-size: 0.9rem;
+    }
+
+    /* Stats - single column on very small screens */
+    .stats-container {
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--space-sm);
     }
 
     .stat-number {
         font-size: 1.6rem;
+    }
+
+    .stat-label {
+        font-size: 0.58rem;
+        letter-spacing: 1.5px;
     }
 
     .logo-name {
@@ -2855,6 +3081,76 @@ h4 {
 
     .logo-icon {
         font-size: 1.8rem;
+    }
+
+    /* Gallery single column on very small */
+    .gallery-grid {
+        grid-template-columns: 1fr;
+        gap: 2px;
+    }
+
+    /* Footer more compact */
+    .footer-hours ul li {
+        font-size: 0.75rem;
+        flex-wrap: wrap;
+    }
+
+    /* Testimonial more compact */
+    .testimonial-text {
+        font-size: 0.85rem;
+        line-height: 1.7;
+    }
+
+    .testimonial-nav {
+        gap: 12px;
+    }
+
+    .testimonial-btn {
+        width: 36px;
+        height: 36px;
+    }
+
+    /* Offer more compact */
+    .offer-badge {
+        padding: 6px 16px;
+        font-size: 0.6rem;
+        letter-spacing: 2px;
+    }
+
+    .offer-title {
+        font-size: 1.2rem;
+        letter-spacing: 1px;
+    }
+
+    .offer-desc {
+        font-size: 0.82rem;
+    }
+
+    /* Reservation form */
+    .reservation-form {
+        padding: 16px 12px;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        padding: 10px 12px;
+        font-size: 0.85rem;
+    }
+
+    /* Contact */
+    .contact-card {
+        padding: var(--space-md);
+    }
+
+    .contact-form-wrap {
+        padding: var(--space-md);
+    }
+
+    .contact-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 0.8rem;
     }
 }
 
