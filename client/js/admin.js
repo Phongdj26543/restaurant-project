@@ -1703,17 +1703,18 @@ function initDashboard() {
     console.log('🏮 Admin Dashboard loaded');
 }
 
-// Kiểm tra trạng thái MongoDB
+// Kiểm tra trạng thái Database
 async function checkDbStatus() {
     try {
         const res = await fetch(`${API}/health?_t=${Date.now()}`);
         const data = await res.json();
         console.log('[Health Check]', data);
-        if (data.database && !data.database.mongoConnected) {
-            showToast('⚠️ MongoDB chưa kết nối! Dữ liệu sẽ KHÔNG được lưu vĩnh viễn. Kiểm tra Network Access trên MongoDB Atlas.', 'error');
-            console.error('[DB Status] MongoDB NOT connected:', data.database);
-        } else if (data.database && data.database.mongoConnected) {
-            console.log('[DB Status] MongoDB connected OK ✅');
+        const dbConnected = data.database && (data.database.connected || data.database.mongoConnected);
+        if (data.database && !dbConnected) {
+            showToast('⚠️ Database chưa kết nối! Dữ liệu sẽ KHÔNG được lưu. Kiểm tra cấu hình database.', 'error');
+            console.error('[DB Status] Database NOT connected:', data.database);
+        } else if (dbConnected) {
+            console.log('[DB Status] Database connected OK ✅');
         }
     } catch (e) {
         console.error('[Health Check] Error:', e);

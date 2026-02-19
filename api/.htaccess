@@ -1,0 +1,14 @@
+# =====================================================
+# Bảo vệ thư mục API
+# Chặn truy cập trực tiếp file PHP ngoài index.php
+# =====================================================
+
+# Chặn truy cập config.php và helpers.php trực tiếp
+<FilesMatch "^(config|helpers)\.php$">
+    Deny from all
+</FilesMatch>
+
+# Đảm bảo index.php có thể truy cập
+<Files "index.php">
+    Allow from all
+</Files>
