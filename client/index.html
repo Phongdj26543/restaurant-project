@@ -116,10 +116,19 @@
         <video class="hero-video" id="heroVideo" playsinline></video>
         <div class="hero-overlay"></div>
         <div class="hero-particles" id="heroParticles"></div>
+
+        <!-- Video Sound Overlay - click to enable sound -->
+        <div class="video-sound-overlay" id="videoSoundOverlay" style="display:none;">
+            <div class="sound-overlay-content">
+                <i class="fas fa-volume-up"></i>
+                <span>Nhấn để bật âm thanh</span>
+            </div>
+        </div>
+
         <!-- Video controls -->
         <div class="hero-video-controls" id="heroVideoControls" style="display:none;">
             <button class="hero-video-btn" id="heroVideoMute" title="Bật/tắt âm thanh">
-                <i class="fas fa-volume-mute"></i>
+                <i class="fas fa-volume-up"></i>
             </button>
             <button class="hero-video-btn" id="heroVideoSkip" title="Bỏ qua video">
                 <i class="fas fa-forward"></i> <span data-i18n="video_skip">Bỏ qua</span>

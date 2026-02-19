@@ -39,18 +39,26 @@ const DB_FILES = {
     contacts: path.join(DATA_DIR, 'contacts.json')
 };
 
-// Đọc file JSON
+// Memory cache cho Vercel (giữ data giữa các request trong cùng instance)
+const memoryCache = {};
+
+// Đọc file JSON (có memory cache)
 function readJSON(file) {
+    // Return from cache if available
+    if (memoryCache[file]) return memoryCache[file];
     try {
         if (!fs.existsSync(file)) return [];
-        return JSON.parse(fs.readFileSync(file, 'utf8'));
+        const data = JSON.parse(fs.readFileSync(file, 'utf8'));
+        memoryCache[file] = data;
+        return data;
     } catch { return []; }
 }
 
-// Ghi file JSON
+// Ghi file JSON (cập nhật cả cache)
 function writeJSON(file, data) {
     if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
     fs.writeFileSync(file, JSON.stringify(data, null, 2), 'utf8');
+    memoryCache[file] = data;
 }
 
 const jsonDB = { readJSON, writeJSON, DB_FILES };

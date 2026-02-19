@@ -174,7 +174,7 @@ const FOOD_I18N = {
 
 async function loadMenu() {
     try {
-        const response = await fetch(`${API_BASE}/menu`);
+        const response = await fetch(`${API_BASE}/menu?_t=${Date.now()}`);
         const result = await response.json();
 
         if (result.success) {
@@ -919,7 +919,7 @@ function showToast(message, type = 'success') {
 // =====================================================
 async function loadDynamicContent() {
     try {
-        const res = await fetch(`${API_BASE}/content`);
+        const res = await fetch(`${API_BASE}/content?_t=${Date.now()}`);
         const data = await res.json();
         if (!data.success) return;
         const ct = data.data;
@@ -1206,44 +1206,62 @@ function showVideoIntro(videoUrl, startMuted) {
     const controls = document.getElementById('heroVideoControls');
     const skipBtn = document.getElementById('heroVideoSkip');
     const muteBtn = document.getElementById('heroVideoMute');
+    const soundOverlay = document.getElementById('videoSoundOverlay');
     const hero = document.querySelector('.hero');
 
     if (!heroVideo || !hero) return;
 
-    // Mặc định phát có âm thanh
-    heroVideo.muted = startMuted;
-    updateMuteIcon(muteBtn, heroVideo.muted);
-
     heroVideo.src = videoUrl;
-    heroVideo.loop = true; // Lặp lại video liên tục
+    heroVideo.loop = true;
     heroVideo.preload = 'auto';
+    heroVideo.muted = false; // Thử phát có âm thanh
+    updateMuteIcon(muteBtn, false);
     heroVideo.load();
 
-    function playVideo() {
+    function showControls() {
         heroVideo.classList.add('active');
         heroVideo.classList.remove('fading');
         hero.classList.add('hero--video-playing');
         if (controls) controls.style.display = 'flex';
-        heroVideo.play().catch(() => {
-            // Autoplay bị chặn? Thử muted trước
-            heroVideo.muted = true;
-            updateMuteIcon(muteBtn, true);
-            heroVideo.play().catch(() => { });
-        });
     }
 
     heroVideo.addEventListener('canplay', () => {
-        playVideo();
+        showControls();
+        // Thử phát có âm thanh trước
+        heroVideo.muted = false;
+        const playPromise = heroVideo.play();
+        if (playPromise !== undefined) {
+            playPromise.then(() => {
+                // Phát có âm thanh thành công!
+                updateMuteIcon(muteBtn, false);
+                if (soundOverlay) soundOverlay.style.display = 'none';
+            }).catch(() => {
+                // Trình duyệt chặn autoplay có âm -> phát muted + hiện overlay
+                heroVideo.muted = true;
+                updateMuteIcon(muteBtn, true);
+                heroVideo.play().catch(() => { });
+                // Hiện overlay để user click bật âm thanh
+                if (soundOverlay) soundOverlay.style.display = 'flex';
+            });
+        }
     }, { once: true });
+
+    // Click vào overlay = bật âm thanh
+    if (soundOverlay) {
+        soundOverlay.addEventListener('click', () => {
+            heroVideo.muted = false;
+            updateMuteIcon(muteBtn, false);
+            if (heroVideo.paused) heroVideo.play().catch(() => { });
+            soundOverlay.style.display = 'none';
+        });
+    }
 
     // Khi quay lại tab/app -> tự động phát lại video
     document.addEventListener('visibilitychange', () => {
         if (!heroVideo.src || !heroVideo.classList.contains('active')) return;
         if (document.hidden) {
-            // Rời tab -> tạm dừng
             heroVideo.pause();
         } else {
-            // Quay lại tab -> phát lại
             heroVideo.play().catch(() => {
                 heroVideo.muted = true;
                 updateMuteIcon(muteBtn, true);
@@ -1263,6 +1281,7 @@ function showVideoIntro(videoUrl, startMuted) {
         heroVideo.classList.add('fading');
         hero.classList.remove('hero--video-playing');
         if (controls) controls.style.display = 'none';
+        if (soundOverlay) soundOverlay.style.display = 'none';
         setTimeout(() => {
             heroVideo.pause();
             heroVideo.classList.remove('active', 'fading');
@@ -1274,17 +1293,17 @@ function showVideoIntro(videoUrl, startMuted) {
         muteBtn.addEventListener('click', () => {
             heroVideo.muted = !heroVideo.muted;
             updateMuteIcon(muteBtn, heroVideo.muted);
-            // If unmuting and autoplay was blocked, try play
             if (!heroVideo.muted && heroVideo.paused) {
                 heroVideo.play().catch(() => {
                     heroVideo.muted = true;
                     updateMuteIcon(muteBtn, true);
                 });
             }
+            if (soundOverlay) soundOverlay.style.display = 'none';
         });
     }
 
-    // Skip button
+    // Skip button - dừng hẳn video
     if (skipBtn) skipBtn.addEventListener('click', stopVideo);
 }
 

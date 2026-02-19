@@ -204,9 +204,17 @@ if (IS_VERCEL && !fs.existsSync(CONTENT_FILE) && fs.existsSync(CONTENT_FILE_REPO
     fs.copyFileSync(CONTENT_FILE_REPO, CONTENT_FILE);
 }
 
+// Global memory cache cho Vercel (giữ data giữa các request trong cùng instance)
+let contentCache = null;
+
 function readContent() {
+    // Trả về từ memory cache nếu có (nhanh hơn và persist trên Vercel)
+    if (contentCache) return contentCache;
     try {
-        if (fs.existsSync(CONTENT_FILE)) return JSON.parse(fs.readFileSync(CONTENT_FILE, 'utf8'));
+        if (fs.existsSync(CONTENT_FILE)) {
+            contentCache = JSON.parse(fs.readFileSync(CONTENT_FILE, 'utf8'));
+            return contentCache;
+        }
     } catch { }
     // Default content
     return {
@@ -248,10 +256,21 @@ function writeContent(data) {
     const dir = path.dirname(CONTENT_FILE);
     if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
     fs.writeFileSync(CONTENT_FILE, JSON.stringify(data, null, 2), 'utf8');
+    // Cập nhật memory cache
+    contentCache = data;
 }
 
-// GET content
-app.get('/api/content', (req, res) => {
+// Middleware chống cache cho API (quan trọng cho Vercel CDN)
+function noCache(req, res, next) {
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.set('Pragma', 'no-cache');
+    res.set('Expires', '0');
+    res.set('Surrogate-Control', 'no-store');
+    next();
+}
+
+// GET content - không cache
+app.get('/api/content', noCache, (req, res) => {
     res.json({ success: true, data: readContent() });
 });
 
@@ -273,7 +292,7 @@ app.put('/api/content', requireAdmin, express.json(), (req, res) => {
         if (req.body.socialLinks) updated.socialLinks = { ...current.socialLinks, ...req.body.socialLinks };
         if (req.body.footerHours) updated.footerHours = { ...current.footerHours, ...req.body.footerHours };
         writeContent(updated);
-        res.json({ success: true, data: updated, message: 'Đã cập nhật nội dung' });
+        res.json({ success: true, data: updated, message: 'Đã cập nhật nội dung thành công! Thay đổi sẽ hiển thị ngay.' });
     } catch (error) {
         console.error('Update content error:', error);
         res.status(500).json({ success: false, message: 'Lỗi cập nhật nội dung' });
@@ -303,9 +322,9 @@ app.post('/api/admin/login', express.json(), (req, res) => {
 // =====================================================
 // API ROUTES
 // =====================================================
-app.use('/api/menu', apiLimiter, menuRoutes);
-app.use('/api/reservations', reservationRoutes);
-app.use('/api/contacts', contactRoutes);
+app.use('/api/menu', noCache, apiLimiter, menuRoutes);
+app.use('/api/reservations', noCache, reservationRoutes);
+app.use('/api/contacts', noCache, contactRoutes);
 
 // Áp dụng formLimiter cho POST routes
 app.post('/api/reservations', formLimiter);
