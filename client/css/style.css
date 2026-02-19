@@ -2391,7 +2391,7 @@ h4 {
     .nav-menu {
         position: fixed;
         top: 0;
-        right: -100%;
+        right: 0;
         width: 280px;
         height: 100vh;
         background: rgba(10, 10, 10, 0.99);
@@ -2400,13 +2400,16 @@ h4 {
         justify-content: center;
         gap: 4px;
         padding: var(--space-2xl);
-        transition: right 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         z-index: 1000;
         border-left: 1px solid rgba(212, 175, 55, 0.1);
+        transform: translateX(100%);
+        visibility: hidden;
     }
 
     .nav-menu.open {
-        right: 0;
+        transform: translateX(0);
+        visibility: visible;
     }
 
     .lang-switcher {
