@@ -116,6 +116,9 @@
 html {
     scroll-behavior: smooth;
     font-size: 16px;
+    overflow-x: hidden;
+    width: 100%;
+    max-width: 100%;
 }
 
 body {
@@ -125,6 +128,7 @@ body {
     line-height: 1.7;
     overflow-x: hidden;
     width: 100%;
+    max-width: 100%;
     min-width: 0;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -2824,7 +2828,12 @@ h4 {
     .offer-banner,
     .footer {
         overflow-x: hidden;
-        max-width: 100vw;
+        max-width: 100%;
+    }
+
+    /* FIX nav-menu fixed position causing overflow */
+    .nav-menu {
+        overflow-x: hidden;
     }
 
     /* FIX about-image decorative elements overflow */
