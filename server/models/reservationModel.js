@@ -1,24 +1,26 @@
 /* =====================================================
- * Reservation Model - Hỗ trợ MySQL + JSON fallback
+ * Reservation Model - Hỗ trợ MongoDB + JSON fallback
  * ===================================================== */
 
-const { pool, jsonDB, isMySQL } = require('../config/db');
+const { isMongo, ReservationModel, jsonDB } = require('../config/db');
 const { readJSON, writeJSON, DB_FILES } = jsonDB;
 
 const Reservation = {
     async create(data) {
         const { name, phone, email, date, time, guests, note, preOrder } = data;
-        const preOrderJSON = preOrder ? JSON.stringify(preOrder) : null;
 
-        if (isMySQL()) {
-            const [result] = await pool().query(
-                'INSERT INTO reservations (name, phone, email, date, time, guests, note, pre_order) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-                [name, phone, email || null, date, time, guests, note || null, preOrderJSON]
-            );
-            return { id: result.insertId, ...data, status: 'pending', created_at: new Date().toISOString() };
+        if (isMongo()) {
+            const doc = await ReservationModel.create({
+                name, phone, email: email || null,
+                date, time, guests,
+                note: note || null,
+                pre_order: preOrder || null,
+                status: 'pending',
+                created_at: new Date()
+            });
+            return { id: doc._id, ...doc.toObject() };
         }
 
-        // JSON fallback
         const list = readJSON(DB_FILES.reservations);
         const newItem = {
             id: list.length > 0 ? Math.max(...list.map(r => r.id)) + 1 : 1,
@@ -34,12 +36,13 @@ const Reservation = {
     },
 
     async getAll(limit = 50, offset = 0) {
-        if (isMySQL()) {
-            const [rows] = await pool().query(
-                'SELECT * FROM reservations ORDER BY created_at DESC LIMIT ? OFFSET ?',
-                [limit, offset]
-            );
-            return rows;
+        if (isMongo()) {
+            const docs = await ReservationModel.find()
+                .sort({ created_at: -1 })
+                .skip(offset)
+                .limit(limit)
+                .lean();
+            return docs.map(d => ({ id: d._id, ...d }));
         }
         const list = readJSON(DB_FILES.reservations);
         list.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
@@ -47,12 +50,9 @@ const Reservation = {
     },
 
     async getByDate(date) {
-        if (isMySQL()) {
-            const [rows] = await pool().query(
-                'SELECT * FROM reservations WHERE date = ? ORDER BY time',
-                [date]
-            );
-            return rows;
+        if (isMongo()) {
+            const docs = await ReservationModel.find({ date }).sort({ time: 1 }).lean();
+            return docs.map(d => ({ id: d._id, ...d }));
         }
         return readJSON(DB_FILES.reservations)
             .filter(r => r.date === date)
@@ -60,12 +60,9 @@ const Reservation = {
     },
 
     async updateStatus(id, status) {
-        if (isMySQL()) {
-            const [result] = await pool().query(
-                'UPDATE reservations SET status = ? WHERE id = ?',
-                [status, id]
-            );
-            return result.affectedRows > 0;
+        if (isMongo()) {
+            const result = await ReservationModel.findByIdAndUpdate(id, { status });
+            return !!result;
         }
         const list = readJSON(DB_FILES.reservations);
         const item = list.find(r => r.id === Number(id));
@@ -76,9 +73,9 @@ const Reservation = {
     },
 
     async delete(id) {
-        if (isMySQL()) {
-            const [result] = await pool().query('DELETE FROM reservations WHERE id = ?', [id]);
-            return result.affectedRows > 0;
+        if (isMongo()) {
+            const result = await ReservationModel.findByIdAndDelete(id);
+            return !!result;
         }
         const list = readJSON(DB_FILES.reservations);
         const index = list.findIndex(r => r.id === Number(id));
@@ -89,9 +86,8 @@ const Reservation = {
     },
 
     async getCount() {
-        if (isMySQL()) {
-            const [rows] = await pool().query('SELECT COUNT(*) as total FROM reservations');
-            return rows[0].total;
+        if (isMongo()) {
+            return await ReservationModel.countDocuments();
         }
         return readJSON(DB_FILES.reservations).length;
     }

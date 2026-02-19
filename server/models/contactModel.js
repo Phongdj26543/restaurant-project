@@ -1,20 +1,20 @@
 /* =====================================================
- * Contact Model - Hỗ trợ MySQL + JSON fallback
+ * Contact Model - Hỗ trợ MongoDB + JSON fallback
  * ===================================================== */
 
-const { pool, jsonDB, isMySQL } = require('../config/db');
+const { isMongo, ContactModel, jsonDB } = require('../config/db');
 const { readJSON, writeJSON, DB_FILES } = jsonDB;
 
 const Contact = {
     async create(data) {
         const { name, email, subject, message } = data;
 
-        if (isMySQL()) {
-            const [result] = await pool().query(
-                'INSERT INTO contacts (name, email, subject, message) VALUES (?, ?, ?, ?)',
-                [name, email, subject || null, message]
-            );
-            return { id: result.insertId, ...data, created_at: new Date().toISOString() };
+        if (isMongo()) {
+            const doc = await ContactModel.create({
+                name, email, subject: subject || null, message,
+                created_at: new Date()
+            });
+            return { id: doc._id, ...doc.toObject() };
         }
 
         const list = readJSON(DB_FILES.contacts);
@@ -29,12 +29,13 @@ const Contact = {
     },
 
     async getAll(limit = 50, offset = 0) {
-        if (isMySQL()) {
-            const [rows] = await pool().query(
-                'SELECT * FROM contacts ORDER BY created_at DESC LIMIT ? OFFSET ?',
-                [limit, offset]
-            );
-            return rows;
+        if (isMongo()) {
+            const docs = await ContactModel.find()
+                .sort({ created_at: -1 })
+                .skip(offset)
+                .limit(limit)
+                .lean();
+            return docs.map(d => ({ id: d._id, ...d }));
         }
         const list = readJSON(DB_FILES.contacts);
         list.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
@@ -42,9 +43,9 @@ const Contact = {
     },
 
     async delete(id) {
-        if (isMySQL()) {
-            const [result] = await pool().query('DELETE FROM contacts WHERE id = ?', [id]);
-            return result.affectedRows > 0;
+        if (isMongo()) {
+            const result = await ContactModel.findByIdAndDelete(id);
+            return !!result;
         }
         const list = readJSON(DB_FILES.contacts);
         const index = list.findIndex(c => c.id === Number(id));

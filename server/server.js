@@ -12,7 +12,7 @@ const fs = require('fs');
 const rateLimit = require('express-rate-limit');
 const multer = require('multer');
 const xssFilters = require('xss-filters');
-const { testConnection, jsonDB } = require('./config/db');
+const { testConnection, jsonDB, isMongo, ContentModel, ReservationModel } = require('./config/db');
 
 // Import routes
 const menuRoutes = require('./routes/menuRoutes');
@@ -197,18 +197,40 @@ const CONTENT_FILE = IS_VERCEL
     ? path.join('/tmp', 'data', 'content.json')
     : CONTENT_FILE_REPO;
 
-// On Vercel: copy content.json from repo to /tmp if not exists
 if (IS_VERCEL && !fs.existsSync(CONTENT_FILE) && fs.existsSync(CONTENT_FILE_REPO)) {
     const tmpDir = path.dirname(CONTENT_FILE);
     if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir, { recursive: true });
     fs.copyFileSync(CONTENT_FILE_REPO, CONTENT_FILE);
 }
 
-// Global memory cache cho Vercel (giữ data giữa các request trong cùng instance)
 let contentCache = null;
 
-function readContent() {
-    // Trả về từ memory cache nếu có (nhanh hơn và persist trên Vercel)
+const DEFAULT_CONTENT = {
+    hero: { subtitle: 'Chào mừng đến với', title: 'Nhà Hàng Phố Cổ', tagline: 'Hương vị truyền thống giữa lòng phố cổ Ninh Bình', description: 'Trải nghiệm ẩm thực đặc sản Ninh Bình trong không gian mang đậm hồn phố cổ', backgroundImage: '' },
+    about: { title: 'Về Nhà Hàng Phố Cổ', description: '', image: '', experience: '15+' },
+    contact: { address: '72A Đinh Tất Miễn – đường Lê Thái Tổ, Ninh Bình', phone: '0229 123 4567', email: 'info@phoconinhbinh.vn', openHours: '10:00 - 22:00', mapUrl: '' },
+    introVideo: { url: '', enabled: false },
+    gallery: [],
+    stats: { customers: 15000, dishes: 50, years: 10, reviews: 4800 },
+    testimonials: [],
+    offer: { enabled: true, badge: 'Ưu đãi đặc biệt', title: 'Giảm 15% cho đặt bàn Online', desc: '', btnText: 'Đặt Bàn & Nhận Ưu Đãi' },
+    floatingContact: { phone: '02293888888', zalo: 'https://zalo.me/0229388888', messenger: 'https://m.me/nhahangphoco' },
+    socialLinks: { facebook: '', instagram: '', tiktok: '', zalo: '' },
+    footerHours: { weekday: '09:00 - 22:00', saturday: '08:00 - 23:00', sunday: '08:00 - 22:00' }
+};
+
+async function readContent() {
+    // MongoDB
+    if (isMongo()) {
+        try {
+            const doc = await ContentModel.findOne({ key: 'main' }).lean();
+            return doc ? doc.data : DEFAULT_CONTENT;
+        } catch (e) {
+            console.error('MongoDB readContent error:', e.message);
+            return DEFAULT_CONTENT;
+        }
+    }
+    // JSON fallback
     if (contentCache) return contentCache;
     try {
         if (fs.existsSync(CONTENT_FILE)) {
@@ -216,47 +238,27 @@ function readContent() {
             return contentCache;
         }
     } catch { }
-    // Default content
-    return {
-        hero: {
-            subtitle: 'Chào mừng đến với',
-            title: 'Nhà Hàng Phố Cổ',
-            tagline: 'Hương vị truyền thống giữa lòng phố cổ Ninh Bình',
-            description: 'Trải nghiệm ẩm thực đặc sản Ninh Bình trong không gian mang đậm hồn phố cổ',
-            backgroundImage: ''
-        },
-        about: {
-            title: 'Về Nhà Hàng Phố Cổ',
-            description: '',
-            image: '',
-            experience: '15+'
-        },
-        contact: {
-            address: '72A Đinh Tất Miễn – đường Lê Thái Tổ, Ninh Bình',
-            phone: '0229 123 4567',
-            email: 'info@phoconinhbinh.vn',
-            openHours: '10:00 - 22:00',
-            mapUrl: ''
-        },
-        introVideo: {
-            url: '',
-            enabled: false
-        },
-        gallery: [],
-        stats: { customers: 15000, dishes: 50, years: 10, reviews: 4800 },
-        testimonials: [],
-        offer: { enabled: true, badge: 'Ưu đãi đặc biệt', title: 'Giảm 15% cho đặt bàn Online', desc: '', btnText: 'Đặt Bàn & Nhận Ưu Đãi' },
-        floatingContact: { phone: '02293888888', zalo: 'https://zalo.me/0229388888', messenger: 'https://m.me/nhahangphoco' },
-        socialLinks: { facebook: '', instagram: '', tiktok: '', zalo: '' },
-        footerHours: { weekday: '09:00 - 22:00', saturday: '08:00 - 23:00', sunday: '08:00 - 22:00' }
-    };
+    return DEFAULT_CONTENT;
 }
 
-function writeContent(data) {
+async function writeContent(data) {
+    // MongoDB
+    if (isMongo()) {
+        try {
+            await ContentModel.findOneAndUpdate(
+                { key: 'main' },
+                { data },
+                { upsert: true, new: true }
+            );
+            return;
+        } catch (e) {
+            console.error('MongoDB writeContent error:', e.message);
+        }
+    }
+    // JSON fallback
     const dir = path.dirname(CONTENT_FILE);
     if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
     fs.writeFileSync(CONTENT_FILE, JSON.stringify(data, null, 2), 'utf8');
-    // Cập nhật memory cache
     contentCache = data;
 }
 
@@ -270,14 +272,20 @@ function noCache(req, res, next) {
 }
 
 // GET content - không cache
-app.get('/api/content', noCache, (req, res) => {
-    res.json({ success: true, data: readContent() });
+app.get('/api/content', noCache, async (req, res) => {
+    try {
+        const data = await readContent();
+        res.json({ success: true, data });
+    } catch (error) {
+        console.error('Read content error:', error);
+        res.status(500).json({ success: false, message: 'Lỗi đọc nội dung' });
+    }
 });
 
 // PUT content (update) - yêu cầu admin
-app.put('/api/content', requireAdmin, express.json(), (req, res) => {
+app.put('/api/content', requireAdmin, express.json(), async (req, res) => {
     try {
-        const current = readContent();
+        const current = await readContent();
         const updated = { ...current, ...req.body };
         // Deep merge sections
         if (req.body.hero) updated.hero = { ...current.hero, ...req.body.hero };
@@ -291,7 +299,7 @@ app.put('/api/content', requireAdmin, express.json(), (req, res) => {
         if (req.body.floatingContact) updated.floatingContact = { ...current.floatingContact, ...req.body.floatingContact };
         if (req.body.socialLinks) updated.socialLinks = { ...current.socialLinks, ...req.body.socialLinks };
         if (req.body.footerHours) updated.footerHours = { ...current.footerHours, ...req.body.footerHours };
-        writeContent(updated);
+        await writeContent(updated);
         res.json({ success: true, data: updated, message: 'Đã cập nhật nội dung thành công! Thay đổi sẽ hiển thị ngay.' });
     } catch (error) {
         console.error('Update content error:', error);
@@ -341,8 +349,14 @@ app.get('/api/health', (req, res) => {
 app.get('/api/analytics', async (req, res) => {
     try {
         const { period = '30' } = req.query;
-        const { readJSON, DB_FILES } = require('./config/db').jsonDB;
-        const allReservations = readJSON(DB_FILES.reservations);
+        let allReservations;
+        if (isMongo()) {
+            allReservations = await ReservationModel.find().lean();
+            allReservations = allReservations.map(d => ({ id: d._id, ...d }));
+        } else {
+            const { readJSON, DB_FILES } = require('./config/db').jsonDB;
+            allReservations = readJSON(DB_FILES.reservations);
+        }
 
         // Filter by period
         let filteredRes = allReservations;
