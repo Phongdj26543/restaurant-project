@@ -22,9 +22,7 @@ const contactRoutes = require('./routes/contactRoutes');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Promise để đợi kết nối DB sẵn sàng (quan trọng cho Vercel cold start)
-let dbReadyPromise = null;
-let dbInitDone = false;
+
 
 // =====================================================
 // MIDDLEWARE
@@ -117,45 +115,15 @@ const formLimiter = rateLimit({
     legacyHeaders: false
 });
 
-// =====================================================
-// WAIT FOR DB CONNECTION (quan trọng cho Vercel cold start)
-// Đảm bảo MongoDB đã kết nối trước khi xử lý API request
-// Timeout sau 9s để không bị Vercel function timeout (10s limit)
-// =====================================================
-app.use('/api', async (req, res, next) => {
-    if (!dbInitDone && dbReadyPromise) {
-        try {
-            // Đặt timeout 9s để không vượt quá Vercel function limit
-            const timeoutPromise = new Promise((_, reject) =>
-                setTimeout(() => reject(new Error('DB wait timeout')), 9000)
-            );
-            await Promise.race([dbReadyPromise, timeoutPromise]);
-        } catch (e) {
-            console.error('DB connection wait error:', e.message);
-        }
-        dbInitDone = true;
-    }
-    next();
-});
+
 
 // Serve static files (Frontend)
 app.use(express.static(path.join(__dirname, '..', 'client')));
 
 // Serve uploaded images
-const IS_VERCEL = process.env.VERCEL === '1';
-const UPLOADS_DIR = IS_VERCEL
-    ? path.join('/tmp', 'uploads')
-    : path.join(__dirname, '..', 'client', 'uploads');
+const UPLOADS_DIR = path.join(__dirname, '..', 'client', 'uploads');
 if (!fs.existsSync(UPLOADS_DIR)) fs.mkdirSync(UPLOADS_DIR, { recursive: true });
 app.use('/uploads', express.static(UPLOADS_DIR));
-
-// On Vercel, also serve static uploads from client/uploads (for pre-existing images in repo)
-if (IS_VERCEL) {
-    const repoUploads = path.join(__dirname, '..', 'client', 'uploads');
-    if (fs.existsSync(repoUploads)) {
-        app.use('/uploads', express.static(repoUploads));
-    }
-}
 
 // =====================================================
 // IMAGE UPLOAD (Multer)
@@ -282,16 +250,7 @@ app.post('/api/upload-video', requireAdmin, videoUpload.single('video'), (req, r
 // =====================================================
 // WEBSITE CONTENT API (Quản lý nội dung trang web)
 // =====================================================
-const CONTENT_FILE_REPO = path.join(__dirname, '..', 'data', 'content.json');
-const CONTENT_FILE = IS_VERCEL
-    ? path.join('/tmp', 'data', 'content.json')
-    : CONTENT_FILE_REPO;
-
-if (IS_VERCEL && !fs.existsSync(CONTENT_FILE) && fs.existsSync(CONTENT_FILE_REPO)) {
-    const tmpDir = path.dirname(CONTENT_FILE);
-    if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir, { recursive: true });
-    fs.copyFileSync(CONTENT_FILE_REPO, CONTENT_FILE);
-}
+const CONTENT_FILE = path.join(__dirname, '..', 'data', 'content.json');
 
 let contentCache = null;
 
@@ -428,17 +387,13 @@ app.use('/api/contacts', noCache, contactRoutes);
 app.post('/api/reservations', formLimiter);
 app.post('/api/contacts', formLimiter);
 
-// Health check - hiển thị trạng thái DB để chẩn đoán
+// Health check
 app.get('/api/health', (req, res) => {
     const dbStatus = getDbStatus();
     res.json({
         status: dbStatus.mongoConnected ? 'ok' : 'degraded',
         message: 'Nhà Hàng Phố Cổ API is running',
         database: dbStatus,
-        env: {
-            isVercel: process.env.VERCEL === '1',
-            nodeEnv: process.env.NODE_ENV || 'development'
-        },
         timestamp: new Date().toISOString()
     });
 });
@@ -574,21 +529,13 @@ app.use((err, req, res, next) => {
 // =====================================================
 // START SERVER
 // =====================================================
-const isVercel = process.env.VERCEL === '1';
-
-if (!isVercel) {
-    async function startServer() {
-        await testConnection();
-        app.listen(PORT, () => {
-            console.log(`🍜 Nhà Hàng Phố Cổ Server đang chạy tại http://localhost:${PORT}`);
-            console.log(`📦 Môi trường: ${process.env.NODE_ENV || 'development'}`);
-        });
-    }
-    startServer();
-} else {
-    // On Vercel, lưu promise để middleware waitForDB có thể await
-    dbReadyPromise = testConnection();
+async function startServer() {
+    await testConnection();
+    app.listen(PORT, () => {
+        console.log(`🍜 Nhà Hàng Phố Cổ Server đang chạy tại http://localhost:${PORT}`);
+        console.log(`📦 Môi trường: ${process.env.NODE_ENV || 'development'}`);
+    });
 }
+startServer();
 
-// Export app for Vercel serverless
 module.exports = app;

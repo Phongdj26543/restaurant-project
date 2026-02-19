@@ -14,15 +14,9 @@ let mongoConnected = false;
 let mongoConnectionError = '';
 
 // =====================================================
-// MONGODB CONNECTION (tối ưu cho Vercel serverless)
-// Cache connection trong global scope để tái sử dụng giữa các invocations
+// MONGODB CONNECTION
 // =====================================================
 const MONGODB_URI = process.env.MONGODB_URI || '';
-const IS_SERVERLESS = process.env.VERCEL === '1';
-
-// Cache connection promise trong global scope (quan trọng cho serverless!)
-// Vercel giữ Lambda warm → biến global được giữ lại → tái sử dụng connection
-let cachedConnection = global._mongoConnection || null;
 
 async function connectMongoDB() {
     if (!MONGODB_URI) {
@@ -31,52 +25,25 @@ async function connectMongoDB() {
         return false;
     }
 
-    // Nếu đã kết nối rồi thì dùng luôn (warm Lambda)
+    // Nếu đã kết nối rồi thì dùng luôn
     if (mongoose.connection.readyState === 1) {
         useMongo = true;
         mongoConnected = true;
         mongoConnectionError = '';
-        console.log('♻️  Tái sử dụng kết nối MongoDB (warm)');
+        console.log('♻️  Tái sử dụng kết nối MongoDB');
         return true;
     }
 
-    // Nếu đang có cached promise (đang kết nối), đợi nó
-    if (cachedConnection) {
-        console.log('⏳ Đang chờ kết nối MongoDB cached...');
-        try {
-            await cachedConnection;
-            if (mongoose.connection.readyState === 1) {
-                useMongo = true;
-                mongoConnected = true;
-                return true;
-            }
-        } catch {
-            cachedConnection = null;
-            global._mongoConnection = null;
-        }
-    }
-
     try {
-        console.log('🔌 Tạo kết nối MongoDB mới...');
+        console.log('🔌 Kết nối MongoDB...');
 
-        // Cấu hình tối ưu cho serverless:
-        // - maxPoolSize: 1 để giảm tối đa số connections  
-        // - minPoolSize: 0 để không giữ connection idle
-        const connectOptions = {
-            serverSelectionTimeoutMS: IS_SERVERLESS ? 8000 : 15000,
+        await mongoose.connect(MONGODB_URI, {
+            serverSelectionTimeoutMS: 15000,
             socketTimeoutMS: 30000,
-            connectTimeoutMS: IS_SERVERLESS ? 8000 : 15000,
-            maxPoolSize: 1,       // CHỈ 1 connection per Lambda instance
-            minPoolSize: 0,       // Không giữ connection idle
-            maxIdleTimeMS: 10000, // Đóng connection idle sau 10s
+            connectTimeoutMS: 15000,
+            maxPoolSize: 5,
             bufferCommands: true,
-        };
-
-        // Cache promise để các request đồng thời dùng chung
-        cachedConnection = mongoose.connect(MONGODB_URI, connectOptions);
-        global._mongoConnection = cachedConnection;
-
-        await cachedConnection;
+        });
 
         console.log('✅ Kết nối MongoDB thành công!');
         useMongo = true;
@@ -92,8 +59,6 @@ async function connectMongoDB() {
         console.error('❌ Lỗi kết nối MongoDB:', error.message);
         useMongo = false;
         mongoConnected = false;
-        cachedConnection = null;
-        global._mongoConnection = null;
         return false;
     }
 }
@@ -181,23 +146,7 @@ const ImageModel = mongoose.model('Image', imageSchema);
 // =====================================================
 // JSON FILE STORAGE (fallback khi không có MongoDB)
 // =====================================================
-const IS_VERCEL = process.env.VERCEL === '1';
-const REPO_DATA_DIR = path.join(__dirname, '..', '..', 'data');
-const DATA_DIR = IS_VERCEL ? path.join('/tmp', 'data') : REPO_DATA_DIR;
-
-if (IS_VERCEL && !fs.existsSync(DATA_DIR)) {
-    fs.mkdirSync(DATA_DIR, { recursive: true });
-    if (fs.existsSync(REPO_DATA_DIR)) {
-        const files = fs.readdirSync(REPO_DATA_DIR);
-        files.forEach(file => {
-            const src = path.join(REPO_DATA_DIR, file);
-            const dest = path.join(DATA_DIR, file);
-            if (!fs.existsSync(dest)) {
-                fs.copyFileSync(src, dest);
-            }
-        });
-    }
-}
+const DATA_DIR = path.join(__dirname, '..', '..', 'data');
 
 const DB_FILES = {
     menu: path.join(DATA_DIR, 'menu.json'),
@@ -278,7 +227,7 @@ async function seedInitialData() {
             };
 
             // Nếu có file content.json local, dùng nó thay vì default
-            const localContentFile = path.join(REPO_DATA_DIR, 'content.json');
+            const localContentFile = path.join(DATA_DIR, 'content.json');
             let seedData = defaultContent;
             try {
                 if (fs.existsSync(localContentFile)) {
