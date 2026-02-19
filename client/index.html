@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Nhà Hàng Phố Cổ - Ẩm thực đặc sản Ninh Bình tại 72A Đinh Tất Miễn – đường Lê Thái Tổ, Ninh Bình">
+    <meta name="keywords" content="nhà hàng ninh bình, phố cổ ninh bình, đặc sản ninh bình, cơm cháy, thịt dê">
+    <title>Nhà Hàng Phố Cổ | Ẩm Thực Ninh Bình</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏮</text></svg>">
+
+    <!-- SEO Open Graph -->
+    <meta property="og:title" content="Nhà Hàng Phố Cổ - Ẩm Thực Ninh Bình">
+    <meta property="og:description"
+        content="Trải nghiệm ẩm thực đặc sản Ninh Bình trong không gian phố cổ truyền thống. Cơm cháy, thịt dê, miến lươn...">
+    <meta property="og:image" content="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1200">
+    <meta property="og:type" content="restaurant">
+    <meta property="og:locale" content="vi_VN">
+    <meta name="theme-color" content="#0A0A0A">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Open+Sans:wght@300;400;500;600&family=Dancing+Script:wght@600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Main CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+    <!-- =====================================================
+       LUXURY PRELOADER
+       ===================================================== -->
+    <div class="preloader" id="preloader">
+        <div class="preloader-inner">
+            <div class="preloader-logo">
+                <span class="preloader-icon">🏮</span>
+                <div class="preloader-text">
+                    <span class="preloader-name">Phố Cổ</span>
+                    <span class="preloader-sub">Ninh Bình</span>
+                </div>
+            </div>
+            <div class="preloader-line">
+                <div class="preloader-line-fill"></div>
+            </div>
+            <p class="preloader-tagline">Tinh Hoa Ẩm Thực</p>
+        </div>
+    </div>
+
+    <!-- Scroll Progress Bar -->
+    <div class="scroll-progress" id="scrollProgress"></div>
+
+    <!-- =====================================================
+       HEADER & NAVIGATION
+       ===================================================== -->
+    <header id="header" class="header">
+        <nav class="navbar">
+            <div class="container nav-container">
+                <!-- Logo -->
+                <a href="#home" class="logo">
+                    <span class="logo-icon">🏮</span>
+                    <div class="logo-text">
+                        <span class="logo-name">Phố Cổ</span>
+                        <span class="logo-sub">Ninh Bình</span>
+                    </div>
+                </a>
+
+                <!-- Desktop Navigation -->
+                <ul class="nav-menu" id="navMenu">
+                    <li><a href="#home" class="nav-link active" data-i18n="nav_home">Trang chủ</a></li>
+                    <li><a href="#about" class="nav-link" data-i18n="nav_about">Giới thiệu</a></li>
+                    <li><a href="#menu" class="nav-link" data-i18n="nav_menu">Thực đơn</a></li>
+                    <li><a href="#gallery" class="nav-link" data-i18n="nav_gallery">Gallery</a></li>
+                    <li><a href="#reservation" class="nav-link" data-i18n="nav_reservation">Đặt bàn</a></li>
+                    <li><a href="#contact" class="nav-link" data-i18n="nav_contact">Liên hệ</a></li>
+                </ul>
+
+                <!-- Language Switcher -->
+                <div class="lang-switcher" id="langSwitcher">
+                    <button class="lang-trigger" aria-label="Chọn ngôn ngữ">
+                        <span id="currentFlag">🇻🇳</span>
+                        <span id="currentLang">VI</span>
+                        <i class="fas fa-caret-down"></i>
+                    </button>
+                    <div class="lang-dropdown">
+                        <div class="lang-option active" data-lang="vi"><span class="lang-flag">🇻🇳</span> Tiếng Việt
+                        </div>
+                        <div class="lang-option" data-lang="en"><span class="lang-flag">🇬🇧</span> English</div>
+                        <div class="lang-option" data-lang="zh"><span class="lang-flag">🇨🇳</span> 中文</div>
+                        <div class="lang-option" data-lang="ko"><span class="lang-flag">🇰🇷</span> 한국어</div>
+                    </div>
+                </div>
+
+                <!-- Mobile Toggle -->
+                <button class="nav-toggle" id="navToggle" aria-label="Menu">
+                    <span class="hamburger"></span>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- =====================================================
+       HERO SECTION
+       ===================================================== -->
+    <section id="home" class="hero">
+        <!-- Hero Background Video (hidden until loaded from API) -->
+        <video class="hero-video" id="heroVideo" muted playsinline></video>
+        <div class="hero-overlay"></div>
+        <div class="hero-particles" id="heroParticles"></div>
+        <!-- Video controls -->
+        <div class="hero-video-controls" id="heroVideoControls" style="display:none;">
+            <button class="hero-video-btn" id="heroVideoMute" title="Bật/tắt âm thanh">
+                <i class="fas fa-volume-mute"></i>
+            </button>
+            <button class="hero-video-btn" id="heroVideoSkip" title="Bỏ qua video">
+                <i class="fas fa-forward"></i> <span data-i18n="video_skip">Bỏ qua</span>
+            </button>
+        </div>
+        <div class="hero-content">
+            <p class="hero-subtitle" id="dyn-hero-subtitle" data-i18n="hero_subtitle">Chào mừng đến với</p>
+            <h1 class="hero-title" id="dyn-hero-title" data-i18n="hero_title">Nhà Hàng Phố Cổ</h1>
+            <p class="hero-tagline" id="dyn-hero-tagline" data-i18n="hero_tagline">Hương vị truyền thống giữa lòng phố
+                cổ Ninh Bình</p>
+            <div class="hero-divider">
+                <span>✦</span>
+            </div>
+            <p class="hero-desc" id="dyn-hero-desc" data-i18n="hero_desc">Trải nghiệm ẩm thực đặc sản Ninh Bình trong
+                không gian mang đậm hồn
+                phố cổ</p>
+            <div class="hero-buttons">
+                <a href="#menu" class="btn btn-primary btn-glow" data-i18n="hero_btn_menu">Xem Thực Đơn</a>
+                <a href="#reservation" class="btn btn-outline" data-i18n="hero_btn_reserve">Đặt Bàn Ngay</a>
+            </div>
+        </div>
+        <div class="hero-scroll">
+            <a href="#about"><i class="fas fa-chevron-down"></i></a>
+        </div>
+    </section>
+
+    <div class="section-shape">
+        <svg viewBox="0 0 1440 80" preserveAspectRatio="none">
+            <path d="M0,40 C360,80 720,0 1080,40 C1260,60 1380,40 1440,40 L1440,80 L0,80 Z" fill="var(--color-cream)">
+            </path>
+        </svg>
+    </div>
+
+    <!-- =====================================================
+       ABOUT SECTION
+       ===================================================== -->
+    <section id="about" class="section about">
+        <div class="container">
+            <div class="section-header">
+                <p class="section-subtitle" data-i18n="about_subtitle">Câu chuyện của chúng tôi</p>
+                <h2 class="section-title" data-i18n="about_title">Giới Thiệu</h2>
+                <div class="section-divider"></div>
+            </div>
+
+            <div class="about-grid">
+                <div class="about-image">
+                    <img id="dyn-about-image" src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=600"
+                        alt="Không gian nhà hàng" loading="lazy">
+                    <div class="about-badge">
+                        <span class="badge-number counter" id="dyn-about-exp" data-target="10">10+</span>
+                        <span class="badge-text" data-i18n="about_badge">Năm kinh nghiệm</span>
+                    </div>
+                    <div class="about-image-decor"></div>
+                </div>
+
+                <div class="about-content">
+                    <h3 id="dyn-about-title" data-i18n="about_heading">Nhà Hàng Phố Cổ – Tinh Hoa Ẩm Thực Ninh Bình</h3>
+                    <div id="dyn-about-desc">
+                        <p data-i18n="about_p1">Tọa lạc tại <strong>72A Đinh Tất Miễn – đường Lê Thái Tổ, Ninh
+                                Bình</strong>, Nhà Hàng Phố Cổ
+                            mang đến không gian ẩm thực đậm chất phố cổ Ninh Bình, nơi mỗi món ăn là một câu chuyện văn
+                            hóa
+                            vùng đất Cố Đô.</p>
+                        <p data-i18n="about_p2">Với hơn 10 năm kinh nghiệm, chúng tôi tự hào mang đến những món đặc sản
+                            nổi tiếng nhất của
+                            Ninh
+                            Bình: Cơm cháy, Thịt dê núi, Miến lươn, Ốc núi... được chế biến từ nguyên liệu tươi ngon,
+                            theo
+                            công thức gia truyền.</p>
+                    </div>
+
+                    <div class="about-features">
+                        <div class="feature-item">
+                            <div class="feature-icon"><i class="fas fa-utensils"></i></div>
+                            <div>
+                                <h4 data-i18n="feat1_title">Đặc sản địa phương</h4>
+                                <p data-i18n="feat1_desc">Nguyên liệu tươi sạch mỗi ngày</p>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon"><i class="fas fa-home"></i></div>
+                            <div>
+                                <h4 data-i18n="feat2_title">Không gian phố cổ</h4>
+                                <p data-i18n="feat2_desc">Kiến trúc truyền thống Ninh Bình</p>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon"><i class="fas fa-heart"></i></div>
+                            <div>
+                                <h4 data-i18n="feat3_title">Phục vụ tận tâm</h4>
+                                <p data-i18n="feat3_desc">Dịch vụ chu đáo, chuyên nghiệp</p>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon"><i class="fas fa-fire"></i></div>
+                            <div>
+                                <h4 data-i18n="feat4_title">Công thức gia truyền</h4>
+                                <p data-i18n="feat4_desc">Hương vị đậm đà, khó quên</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="section-shape section-shape--white">
+        <svg viewBox="0 0 1440 80" preserveAspectRatio="none">
+            <path d="M0,20 C480,80 960,0 1440,50 L1440,80 L0,80 Z" fill="var(--color-white)"></path>
+        </svg>
+    </div>
+
+    <!-- =====================================================
+       MENU SECTION
+       ===================================================== -->
+    <section id="menu" class="section menu-section">
+        <div class="container">
+            <div class="section-header">
+                <p class="section-subtitle" data-i18n="menu_subtitle">Khám phá hương vị</p>
+                <h2 class="section-title" data-i18n="menu_title">Thực Đơn</h2>
+                <div class="section-divider"></div>
+            </div>
+
+            <!-- Category Filter -->
+            <div class="menu-filter" id="menuFilter">
+                <button class="filter-btn active" data-category="all" data-i18n="menu_all">Tất cả</button>
+                <!-- Các nút category sẽ load từ API -->
+            </div>
+
+            <!-- Menu Grid -->
+            <div class="menu-grid" id="menuGrid">
+                <!-- Dữ liệu sẽ load từ API -->
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p data-i18n="menu_loading">Đang tải thực đơn...</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="section-shape">
+        <svg viewBox="0 0 1440 80" preserveAspectRatio="none">
+            <path d="M0,60 C320,0 720,80 1440,20 L1440,80 L0,80 Z" fill="var(--color-cream)"></path>
+        </svg>
+    </div>
+
+    <!-- =====================================================
+       STATS COUNTER BAR
+       ===================================================== -->
+    <section class="stats-section">
+        <div class="stats-overlay"></div>
+        <div class="container stats-container">
+            <div class="stat-item reveal">
+                <div class="stat-icon"><i class="fas fa-users"></i></div>
+                <span class="stat-number counter" data-target="15000">0</span>
+                <span class="stat-label" data-i18n="stat_customers">Khách hàng phục vụ</span>
+            </div>
+            <div class="stat-item reveal">
+                <div class="stat-icon"><i class="fas fa-utensils"></i></div>
+                <span class="stat-number counter" data-target="50">0</span>
+                <span class="stat-label" data-i18n="stat_dishes">Món ăn đặc sắc</span>
+            </div>
+            <div class="stat-item reveal">
+                <div class="stat-icon"><i class="fas fa-award"></i></div>
+                <span class="stat-number counter" data-target="10">0</span>
+                <span class="stat-label" data-i18n="stat_years">Năm kinh nghiệm</span>
+            </div>
+            <div class="stat-item reveal">
+                <div class="stat-icon"><i class="fas fa-star"></i></div>
+                <span class="stat-number counter" data-target="4800">0</span>
+                <span class="stat-label" data-i18n="stat_reviews">Đánh giá 5 sao</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- =====================================================
+       GALLERY SECTION
+       ===================================================== -->
+    <section id="gallery" class="section gallery-section">
+        <div class="container">
+            <div class="section-header">
+                <p class="section-subtitle" data-i18n="gallery_subtitle">Khoảnh khắc đẹp</p>
+                <h2 class="section-title" data-i18n="gallery_title">Hình Ảnh</h2>
+                <div class="section-divider"></div>
+            </div>
+
+            <div class="gallery-grid" id="dyn-gallery">
+                <div class="gallery-item gallery-item--large">
+                    <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=600"
+                        alt="Không gian nhà hàng" loading="lazy">
+                    <div class="gallery-overlay">
+                        <span>Không gian nhà hàng</span>
+                    </div>
+                </div>
+                <div class="gallery-item">
+                    <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400" alt="Món ăn đặc sản"
+                        loading="lazy">
+                    <div class="gallery-overlay">
+                        <span>Đặc sản Ninh Bình</span>
+                    </div>
+                </div>
+                <div class="gallery-item">
+                    <img src="https://images.unsplash.com/photo-1559339352-11d035aa65de?w=400" alt="Bàn tiệc"
+                        loading="lazy">
+                    <div class="gallery-overlay">
+                        <span>Bàn tiệc sang trọng</span>
+                    </div>
+                </div>
+                <div class="gallery-item">
+                    <img src="https://images.unsplash.com/photo-1466978913421-dad2ebd01d17?w=400" alt="Món ăn"
+                        loading="lazy">
+                    <div class="gallery-overlay">
+                        <span>Ẩm thực tinh tế</span>
+                    </div>
+                </div>
+                <div class="gallery-item">
+                    <img src="https://images.unsplash.com/photo-1551218808-94e220e084d2?w=400"
+                        alt="Không gian ngoài trời" loading="lazy">
+                    <div class="gallery-overlay">
+                        <span>Không gian ngoài trời</span>
+                    </div>
+                </div>
+                <div class="gallery-item gallery-item--large">
+                    <img src="https://images.unsplash.com/photo-1544148103-0773bf10d330?w=600" alt="Đội ngũ đầu bếp"
+                        loading="lazy">
+                    <div class="gallery-overlay">
+                        <span>Đội ngũ đầu bếp</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =====================================================
+       TESTIMONIALS SECTION
+       ===================================================== -->
+    <section id="testimonials" class="section testimonials-section">
+        <div class="container">
+            <div class="section-header">
+                <p class="section-subtitle" data-i18n="testi_subtitle">Khách hàng nói gì</p>
+                <h2 class="section-title" data-i18n="testi_title">Đánh Giá</h2>
+                <div class="section-divider"></div>
+            </div>
+
+            <div class="testimonials-carousel" id="testimonialCarousel">
+                <div class="testimonial-track" id="testimonialTrack">
+                    <div class="testimonial-card">
+                        <div class="testimonial-stars">
+                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                                class="fas fa-star"></i><i class="fas fa-star"></i>
+                        </div>
+                        <p class="testimonial-text" data-i18n="testi_1_text">"Món thịt dê nướng tại đây tuyệt vời!
+                            Không gian rất đẹp và sang trọng. Nhân viên phục vụ rất chu đáo, chắc chắn sẽ quay lại."
+                        </p>
+                        <div class="testimonial-author">
+                            <div class="testimonial-avatar">
+                                <i class="fas fa-user-circle"></i>
+                            </div>
+                            <div>
+                                <h4 class="testimonial-name" data-i18n="testi_1_name">Nguyễn Minh Anh</h4>
+                                <span class="testimonial-role" data-i18n="testi_1_role">Khách du lịch từ Hà
+                                    Nội</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="testimonial-card">
+                        <div class="testimonial-stars">
+                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                                class="fas fa-star"></i><i class="fas fa-star"></i>
+                        </div>
+                        <p class="testimonial-text" data-i18n="testi_2_text">"Cơm cháy ở đây giòn tan, nước sốt đậm
+                            đà đúng vị truyền thống. Lần nào đến Ninh Bình cũng ghé đây. Rất recommend!"</p>
+                        <div class="testimonial-author">
+                            <div class="testimonial-avatar">
+                                <i class="fas fa-user-circle"></i>
+                            </div>
+                            <div>
+                                <h4 class="testimonial-name" data-i18n="testi_2_name">Trần Đức Huy</h4>
+                                <span class="testimonial-role" data-i18n="testi_2_role">Food Blogger</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="testimonial-card">
+                        <div class="testimonial-stars">
+                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                                class="fas fa-star"></i><i class="fas fa-star"></i>
+                        </div>
+                        <p class="testimonial-text" data-i18n="testi_3_text">"Đặt tiệc 30 người cho công ty, mọi thứ
+                            rất hoàn hảo từ thức ăn đến phục vụ. Giá cả hợp lý, chất lượng vượt mong đợi!"</p>
+                        <div class="testimonial-author">
+                            <div class="testimonial-avatar">
+                                <i class="fas fa-user-circle"></i>
+                            </div>
+                            <div>
+                                <h4 class="testimonial-name" data-i18n="testi_3_name">Lê Thu Hương</h4>
+                                <span class="testimonial-role" data-i18n="testi_3_role">Quản lý doanh nghiệp</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="testimonial-card">
+                        <div class="testimonial-stars">
+                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                                class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
+                        </div>
+                        <p class="testimonial-text" data-i18n="testi_4_text">"Lẩu dê cực ngon, nước dùng đậm vị.
+                            View nhà hàng rất đẹp, phù hợp đi cùng gia đình. Sẽ giới thiệu bạn bè ghé thử!"</p>
+                        <div class="testimonial-author">
+                            <div class="testimonial-avatar">
+                                <i class="fas fa-user-circle"></i>
+                            </div>
+                            <div>
+                                <h4 class="testimonial-name" data-i18n="testi_4_name">Phạm Văn Đạt</h4>
+                                <span class="testimonial-role" data-i18n="testi_4_role">Khách hàng thân thiết</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="testimonial-nav">
+                    <button class="testimonial-btn testimonial-prev" id="testiPrev"><i
+                            class="fas fa-chevron-left"></i></button>
+                    <div class="testimonial-dots" id="testiDots"></div>
+                    <button class="testimonial-btn testimonial-next" id="testiNext"><i
+                            class="fas fa-chevron-right"></i></button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =====================================================
+       SPECIAL OFFER BANNER
+       ===================================================== -->
+    <section class="offer-banner">
+        <div class="offer-bg"></div>
+        <div class="container offer-container">
+            <div class="offer-content reveal">
+                <span class="offer-badge" data-i18n="offer_badge">Ưu đãi đặc biệt</span>
+                <h2 class="offer-title" data-i18n="offer_title">Giảm 15% cho đặt bàn Online</h2>
+                <p class="offer-desc" data-i18n="offer_desc">Đặt bàn trực tuyến ngay hôm nay để nhận ưu đãi giảm giá
+                    15% cho tất cả các món ăn. Áp dụng cho nhóm từ 4 người trở lên.</p>
+                <a href="#reservation" class="btn btn-primary btn-glow" data-i18n="offer_btn">Đặt Bàn & Nhận Ưu
+                    Đãi</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- =====================================================
+       RESERVATION SECTION
+       ===================================================== -->
+    <section id="reservation" class="section reservation-section">
+        <div class="reservation-bg"></div>
+        <div class="container">
+            <div class="section-header section-header--light">
+                <p class="section-subtitle" data-i18n="res_subtitle">Trải nghiệm tuyệt vời</p>
+                <h2 class="section-title" data-i18n="res_title">Đặt Bàn</h2>
+                <div class="section-divider"></div>
+                <p class="section-desc" data-i18n="res_desc">Hãy đặt bàn trước để có trải nghiệm tốt nhất tại Nhà Hàng
+                    Phố Cổ</p>
+            </div>
+
+            <form class="reservation-form" id="reservationForm" novalidate>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="resName"><span data-i18n="res_name">Họ và tên</span> <span
+                                class="required">*</span></label>
+                        <input type="text" id="resName" name="name" placeholder="Nguyễn Văn A" required>
+                        <span class="form-error"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="resPhone"><span data-i18n="res_phone">Số điện thoại</span> <span
+                                class="required">*</span></label>
+                        <input type="tel" id="resPhone" name="phone" placeholder="0912 345 678" required>
+                        <span class="form-error"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="resEmail"><span data-i18n="res_email">Email</span></label>
+                        <input type="email" id="resEmail" name="email" placeholder="email@example.com">
+                        <span class="form-error"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="resGuests"><span data-i18n="res_guests">Số khách</span> <span
+                                class="required">*</span></label>
+                        <div class="custom-select" id="guestsSelect">
+                            <div class="custom-select__trigger">
+                                <span class="custom-select__value" data-placeholder="Chọn số khách"
+                                    data-i18n-value="res_guests_ph">Chọn số khách</span>
+                                <i class="fas fa-chevron-down custom-select__arrow"></i>
+                            </div>
+                            <div class="custom-select__options">
+                                <div class="custom-select__option" data-value="1"><i class="fas fa-user"></i> 1 người
+                                </div>
+                                <div class="custom-select__option" data-value="2"><i class="fas fa-user-friends"></i> 2
+                                    người</div>
+                                <div class="custom-select__option" data-value="3"><i class="fas fa-users"></i> 3 người
+                                </div>
+                                <div class="custom-select__option" data-value="4"><i class="fas fa-users"></i> 4 người
+                                </div>
+                                <div class="custom-select__option" data-value="5"><i class="fas fa-users"></i> 5 người
+                                </div>
+                                <div class="custom-select__option" data-value="6"><i class="fas fa-users"></i> 6-8 người
+                                </div>
+                                <div class="custom-select__option" data-value="10"><i class="fas fa-users"></i> 8-10
+                                    người</div>
+                                <div class="custom-select__option" data-value="15"><i class="fas fa-users"></i> 10-15
+                                    người</div>
+                                <div class="custom-select__option" data-value="20"><i class="fas fa-users"></i> 15-20
+                                    người</div>
+                                <div class="custom-select__option" data-value="30"><i class="fas fa-users"></i> 20-30
+                                    người</div>
+                                <div class="custom-select__option" data-value="50"><i class="fas fa-users"></i> 30+
+                                    người</div>
+                            </div>
+                            <input type="hidden" id="resGuests" name="guests" required>
+                        </div>
+                        <span class="form-error"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="resDate"><span data-i18n="res_date">Ngày đặt</span> <span
+                                class="required">*</span></label>
+                        <input type="date" id="resDate" name="date" required>
+                        <span class="form-error"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="resTime"><span data-i18n="res_time">Giờ đặt</span> <span
+                                class="required">*</span></label>
+                        <div class="custom-select" id="timeSelect">
+                            <div class="custom-select__trigger">
+                                <span class="custom-select__value" data-placeholder="Chọn giờ"
+                                    data-i18n-value="res_time_ph">Chọn giờ</span>
+                                <i class="fas fa-chevron-down custom-select__arrow"></i>
+                            </div>
+                            <div class="custom-select__options">
+                                <div class="custom-select__group-label">Buổi trưa</div>
+                                <div class="custom-select__option" data-value="09:00"><i class="far fa-clock"></i> 09:00
+                                </div>
+                                <div class="custom-select__option" data-value="09:30"><i class="far fa-clock"></i> 09:30
+                                </div>
+                                <div class="custom-select__option" data-value="10:00"><i class="far fa-clock"></i> 10:00
+                                </div>
+                                <div class="custom-select__option" data-value="10:30"><i class="far fa-clock"></i> 10:30
+                                </div>
+                                <div class="custom-select__option" data-value="11:00"><i class="far fa-clock"></i> 11:00
+                                </div>
+                                <div class="custom-select__option" data-value="11:30"><i class="far fa-clock"></i> 11:30
+                                </div>
+                                <div class="custom-select__option" data-value="12:00"><i class="far fa-clock"></i> 12:00
+                                </div>
+                                <div class="custom-select__option" data-value="12:30"><i class="far fa-clock"></i> 12:30
+                                </div>
+                                <div class="custom-select__option" data-value="13:00"><i class="far fa-clock"></i> 13:00
+                                </div>
+                                <div class="custom-select__group-label">Buổi tối</div>
+                                <div class="custom-select__option" data-value="17:00"><i class="far fa-clock"></i> 17:00
+                                </div>
+                                <div class="custom-select__option" data-value="17:30"><i class="far fa-clock"></i> 17:30
+                                </div>
+                                <div class="custom-select__option" data-value="18:00"><i class="far fa-clock"></i> 18:00
+                                </div>
+                                <div class="custom-select__option" data-value="18:30"><i class="far fa-clock"></i> 18:30
+                                </div>
+                                <div class="custom-select__option" data-value="19:00"><i class="far fa-clock"></i> 19:00
+                                </div>
+                                <div class="custom-select__option" data-value="19:30"><i class="far fa-clock"></i> 19:30
+                                </div>
+                                <div class="custom-select__option" data-value="20:00"><i class="far fa-clock"></i> 20:00
+                                </div>
+                                <div class="custom-select__option" data-value="20:30"><i class="far fa-clock"></i> 20:30
+                                </div>
+                                <div class="custom-select__option" data-value="21:00"><i class="far fa-clock"></i> 21:00
+                                </div>
+                            </div>
+                            <input type="hidden" id="resTime" name="time" required>
+                        </div>
+                        <span class="form-error"></span>
+                    </div>
+                </div>
+
+                <div class="form-group form-group--full">
+                    <label for="resNote" data-i18n="res_note">Ghi chú thêm</label>
+                    <textarea id="resNote" name="note" rows="3" placeholder="Yêu cầu đặc biệt, dị ứng thực phẩm..."
+                        data-i18n-ph="res_note_ph"></textarea>
+                </div>
+
+                <!-- ===== PRE-ORDER FOOD SECTION ===== -->
+                <div class="form-group form-group--full order-section">
+                    <div class="order-header" id="orderToggle">
+                        <label>
+                            <i class="fas fa-utensils"></i>
+                            <span data-i18n="res_order_title">Đặt món trước</span>
+                            <span class="order-optional" data-i18n="res_order_optional">(Không bắt buộc)</span>
+                        </label>
+                        <button type="button" class="order-toggle-btn" id="orderToggleBtn">
+                            <span data-i18n="res_order_add">Thêm món</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                    </div>
+
+                    <div class="order-panel" id="orderPanel" style="display:none;">
+                        <!-- Category filter tabs -->
+                        <div class="order-categories" id="orderCategories"></div>
+
+                        <!-- Menu items grid -->
+                        <div class="order-menu-grid" id="orderMenuGrid"></div>
+
+                        <!-- Selected items summary -->
+                        <div class="order-summary" id="orderSummary" style="display:none;">
+                            <div class="order-summary-header">
+                                <h4><i class="fas fa-shopping-basket"></i> <span data-i18n="res_order_selected">Món đã
+                                        chọn</span></h4>
+                                <button type="button" class="order-clear-btn" id="orderClearBtn">
+                                    <i class="fas fa-trash-alt"></i> <span data-i18n="res_order_clear">Xóa tất cả</span>
+                                </button>
+                            </div>
+                            <div class="order-items-list" id="orderItemsList"></div>
+                            <div class="order-total">
+                                <span data-i18n="res_order_total">Tổng tạm tính:</span>
+                                <span class="order-total-price" id="orderTotalPrice">0đ</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-privacy">
+                    <label class="privacy-check">
+                        <input type="checkbox" id="resPrivacy" required>
+                        <span>Tôi đồng ý với <a href="#" class="privacy-link">Chính sách bảo mật</a> và cho phép nhà
+                            hàng lưu trữ thông tin để xử lý đơn đặt bàn.</span>
+                    </label>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-submit" id="reservationBtn">
+                    <span class="btn-text" data-i18n="res_submit">Đặt Bàn Ngay</span>
+                    <span class="btn-loading" style="display:none;"><i class="fas fa-spinner fa-spin"></i> <span
+                            data-i18n="res_sending">Đang
+                            gửi...</span></span>
+                </button>
+            </form>
+
+            <!-- Success Modal -->
+            <div class="modal" id="successModal">
+                <div class="modal-content">
+                    <div class="modal-icon"><i class="fas fa-check-circle"></i></div>
+                    <h3 data-i18n="res_success_title">Đặt Bàn Thành Công!</h3>
+                    <p data-i18n="res_success_msg">Cảm ơn bạn đã đặt bàn tại Nhà Hàng Phố Cổ. Chúng tôi sẽ liên hệ xác
+                        nhận trong thời gian sớm
+                        nhất.</p>
+                    <button class="btn btn-primary" onclick="closeModal()" data-i18n="res_close">Đóng</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =====================================================
+       CONTACT SECTION
+       ===================================================== -->
+    <section id="contact" class="section contact-section">
+        <div class="container">
+            <div class="section-header">
+                <p class="section-subtitle" data-i18n="ct_subtitle">Kết nối với chúng tôi</p>
+                <h2 class="section-title" data-i18n="ct_title">Liên Hệ</h2>
+                <div class="section-divider"></div>
+            </div>
+
+            <div class="contact-grid">
+                <!-- Thông tin liên hệ -->
+                <div class="contact-info">
+                    <div class="contact-card">
+                        <div class="contact-item">
+                            <div class="contact-icon"><i class="fas fa-map-marker-alt"></i></div>
+                            <div>
+                                <h4 data-i18n="ct_address_label">Địa chỉ</h4>
+                                <p id="dyn-ct-address">72A Đinh Tất Miễn – đường Lê Thái Tổ<br>Ninh Bình</p>
+                            </div>
+                        </div>
+
+                        <div class="contact-item">
+                            <div class="contact-icon"><i class="fas fa-phone-alt"></i></div>
+                            <div>
+                                <h4 data-i18n="ct_phone_label">Điện thoại</h4>
+                                <p id="dyn-ct-phone"><a href="tel:02293888888">0229 3 888 888</a></p>
+                            </div>
+                        </div>
+
+                        <div class="contact-item">
+                            <div class="contact-icon"><i class="fas fa-envelope"></i></div>
+                            <div>
+                                <h4 data-i18n="ct_email_label">Email</h4>
+                                <p id="dyn-ct-email"><a href="mailto:info@nhahangphoco.vn">info@nhahangphoco.vn</a></p>
+                            </div>
+                        </div>
+
+                        <div class="contact-item">
+                            <div class="contact-icon"><i class="fas fa-clock"></i></div>
+                            <div>
+                                <h4 data-i18n="ct_hours_label">Giờ mở cửa</h4>
+                                <p id="dyn-ct-hours">Thứ 2 - Chủ nhật: 09:00 - 22:00</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Google Maps Embed -->
+                    <div class="contact-map">
+                        <iframe id="dyn-ct-map"
+                            src="https://maps.google.com/maps?q=72A+%C4%90inh+T%E1%BA%A5t+Mi%E1%BB%85n,+%C4%91%C6%B0%E1%BB%9Dng+L%C3%AA+Th%C3%A1i+T%E1%BB%95,+Ninh+B%C3%ACnh,+Vietnam&t=&z=17&ie=UTF8&iwloc=&output=embed"
+                            width="100%" height="300" style="border:0; border-radius: 12px;" allowfullscreen=""
+                            loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Bản đồ nhà hàng">
+                        </iframe>
+                        <a href="https://www.google.com/maps/search/72A+%C4%90inh+T%E1%BA%A5t+Mi%E1%BB%85n,+L%C3%AA+Th%C3%A1i+T%E1%BB%95,+Ninh+B%C3%ACnh/@20.2506,105.9748,17z"
+                            target="_blank" rel="noopener noreferrer" class="map-overlay-link"
+                            title="Xem trên Google Maps">
+                            <span class="map-overlay-btn" data-i18n="map_btn"><i class="fas fa-map-marked-alt"></i> Xem
+                                Google Maps</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Form liên hệ -->
+                <div class="contact-form-wrap">
+                    <h3 data-i18n="ct_form_title">Gửi Tin Nhắn</h3>
+                    <form class="contact-form" id="contactForm" novalidate>
+                        <div class="form-group">
+                            <label for="ctName"><span data-i18n="ct_name">Họ và tên</span> <span
+                                    class="required">*</span></label>
+                            <input type="text" id="ctName" name="name" placeholder="Nguyễn Văn A" required>
+                            <span class="form-error"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="ctEmail"><span data-i18n="ct_email">Email</span> <span
+                                    class="required">*</span></label>
+                            <input type="email" id="ctEmail" name="email" placeholder="email@example.com" required>
+                            <span class="form-error"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="ctSubject" data-i18n="ct_subject">Tiêu đề</label>
+                            <input type="text" id="ctSubject" name="subject" placeholder="Tiêu đề tin nhắn"
+                                data-i18n-ph="ct_subject_ph">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="ctMessage"><span data-i18n="ct_message">Nội dung</span> <span
+                                    class="required">*</span></label>
+                            <textarea id="ctMessage" name="message" rows="5" placeholder="Nội dung tin nhắn của bạn..."
+                                required data-i18n-ph="ct_message_ph"></textarea>
+                            <span class="form-error"></span>
+                        </div>
+
+                        <div class="form-privacy">
+                            <label class="privacy-check">
+                                <input type="checkbox" id="ctPrivacy" required>
+                                <span>Tôi đồng ý với <a href="#" class="privacy-link">Chính sách bảo mật</a> và cho phép
+                                    nhà hàng lưu trữ thông tin liên hệ.</span>
+                            </label>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-submit" id="contactBtn">
+                            <span class="btn-text" data-i18n="ct_submit">Gửi Tin Nhắn</span>
+                            <span class="btn-loading" style="display:none;"><i class="fas fa-spinner fa-spin"></i> <span
+                                    data-i18n="ct_sending">Đang
+                                    gửi...</span></span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =====================================================
+       FOOTER
+       ===================================================== -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <div class="logo footer-logo">
+                        <span class="logo-icon">🏮</span>
+                        <div class="logo-text">
+                            <span class="logo-name">Phố Cổ</span>
+                            <span class="logo-sub">Ninh Bình</span>
+                        </div>
+                    </div>
+                    <p data-i18n="ft_desc">Nhà Hàng Phố Cổ mang đến trải nghiệm ẩm thực đặc sản Ninh Bình trong không
+                        gian phố cổ truyền
+                        thống.</p>
+                    <div class="footer-social">
+                        <a href="https://www.facebook.com/share/1Htfn7u5oC/?mibextid=wwXIfr" aria-label="Facebook"><i
+                                class="fab fa-facebook-f"></i></a>
+                        <a href="https://www.instagram.com/mphogg_k6?igsh=MTdhN3NiNHZjbW85aQ%3D%3D&utm_source=qr"
+                            aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="https://www.tiktok.com/@davidqc26?_r=1&_t=ZS-941nKaqyrem" aria-label="TikTok"><i
+                                class="fab fa-tiktok"></i></a>
+                        <a href="#" aria-label="Zalo"><i class="fas fa-comment-dots"></i></a>
+                    </div>
+                </div>
+
+                <div class="footer-links">
+                    <h4 data-i18n="ft_links">Liên kết nhanh</h4>
+                    <ul>
+                        <li><a href="#home" data-i18n="nav_home">Trang chủ</a></li>
+                        <li><a href="#about" data-i18n="nav_about">Giới thiệu</a></li>
+                        <li><a href="#menu" data-i18n="nav_menu">Thực đơn</a></li>
+                        <li><a href="#gallery" data-i18n="nav_gallery">Hình ảnh</a></li>
+                        <li><a href="#reservation" data-i18n="nav_reservation">Đặt bàn</a></li>
+                        <li><a href="#contact" data-i18n="nav_contact">Liên hệ</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-hours">
+                    <h4 data-i18n="ft_hours">Giờ mở cửa</h4>
+                    <ul>
+                        <li><span data-i18n="ft_weekday">Thứ 2 - Thứ 6</span><span>09:00 - 22:00</span></li>
+                        <li><span data-i18n="ft_sat">Thứ 7</span><span>08:00 - 23:00</span></li>
+                        <li><span data-i18n="ft_sun">Chủ nhật</span><span>08:00 - 22:00</span></li>
+                    </ul>
+                </div>
+
+                <div class="footer-contact">
+                    <h4 data-i18n="ft_contact">Liên hệ</h4>
+                    <p><i class="fas fa-map-marker-alt"></i> <span id="ft-address">72A Đinh Tất Miễn – đường Lê Thái Tổ,
+                            Ninh Bình</span></p>
+                    <p><i class="fas fa-phone-alt"></i> <span id="ft-phone"><a
+                                href="tel:0886551556">0886551556</a></span></p>
+                    <p><i class="fas fa-envelope"></i> <span id="ft-email"><a
+                                href="mailto:info@phoconinhbinh.vn">info@phoconinhbinh.vn</a></span>
+                    </p>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p data-i18n="ft_copyright">&copy; 2026 Nhà Hàng Phố Cổ - Ninh Bình. All rights reserved.</p>
+                <div class="footer-bottom-links">
+                    <a href="#" id="privacyLink" data-i18n="ft_privacy">Chính sách bảo mật</a>
+                    <span>·</span>
+                    <p class="dev-credit">Dev by <strong>Mphong</strong></p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Back to Top -->
+    <button class="back-to-top" id="backToTop" aria-label="Về đầu trang">
+        <i class="fas fa-chevron-up"></i>
+    </button>
+
+    <!-- =====================================================
+       FLOATING CONTACT BUTTONS
+       ===================================================== -->
+    <div class="floating-contact" id="floatingContact">
+        <div class="floating-actions" id="floatingActions">
+            <a href="tel:02293888888" class="floating-action-btn floating-phone" title="Gọi điện">
+                <i class="fas fa-phone-alt"></i>
+                <span>Gọi ngay</span>
+            </a>
+            <a href="https://zalo.me/0229388888" target="_blank" class="floating-action-btn floating-zalo"
+                title="Chat Zalo">
+                <i class="fas fa-comment-dots"></i>
+                <span>Zalo</span>
+            </a>
+            <a href="https://m.me/nhahangphoco" target="_blank" class="floating-action-btn floating-messenger"
+                title="Messenger">
+                <i class="fab fa-facebook-messenger"></i>
+                <span>Messenger</span>
+            </a>
+        </div>
+        <button class="floating-main-btn" id="floatingMainBtn" aria-label="Liên hệ nhanh">
+            <i class="fas fa-headset floating-icon-open"></i>
+            <i class="fas fa-times floating-icon-close"></i>
+        </button>
+    </div>
+
+    <!-- =====================================================
+       GALLERY LIGHTBOX
+       ===================================================== -->
+    <div class="lightbox" id="lightbox">
+        <button class="lightbox-close" id="lightboxClose"><i class="fas fa-times"></i></button>
+        <button class="lightbox-prev" id="lightboxPrev"><i class="fas fa-chevron-left"></i></button>
+        <button class="lightbox-next" id="lightboxNext"><i class="fas fa-chevron-right"></i></button>
+        <div class="lightbox-content">
+            <img id="lightboxImg" src="" alt="">
+            <p class="lightbox-caption" id="lightboxCaption"></p>
+        </div>
+        <div class="lightbox-counter" id="lightboxCounter"></div>
+    </div>
+
+    <!-- i18n Translations -->
+    <script src="js/i18n.js"></script>
+    <!-- Main JavaScript -->
+    <script src="js/script.js"></script>
+
+    <!-- =====================================================
+       COOKIE CONSENT BANNER
+       ===================================================== -->
+    <div class="cookie-consent" id="cookieConsent" style="display:none;">
+        <div class="cookie-content">
+            <div class="cookie-text">
+                <i class="fas fa-cookie-bite cookie-icon"></i>
+                <p>Trang web này sử dụng cookie để cải thiện trải nghiệm của bạn. Xem <a href="#"
+                        id="cookiePolicyLink">Chính sách bảo mật</a> của chúng tôi.</p>
+            </div>
+            <div class="cookie-actions">
+                <button class="btn btn-sm cookie-accept" id="cookieAccept">Chấp nhận</button>
+                <button class="btn btn-sm btn-ghost cookie-decline" id="cookieDecline">Từ chối</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- =====================================================
+       PRIVACY POLICY MODAL
+       ===================================================== -->
+    <div class="privacy-modal" id="privacyModal" style="display:none;">
+        <div class="privacy-modal-overlay" id="privacyClose"></div>
+        <div class="privacy-modal-content">
+            <button class="privacy-modal-close" id="privacyCloseBtn"><i class="fas fa-times"></i></button>
+            <div class="privacy-modal-body">
+                <h2><i class="fas fa-shield-alt"></i> Chính Sách Bảo Mật</h2>
+                <p class="privacy-updated">Cập nhật lần cuối: 19/02/2026</p>
+
+                <h3>1. Thông tin chúng tôi thu thập</h3>
+                <p>Khi bạn sử dụng dịch vụ <strong>Nhà Hàng Phố Cổ</strong>, chúng tôi có thể thu thập các thông tin
+                    sau:</p>
+                <ul>
+                    <li><strong>Thông tin cá nhân:</strong> Họ tên, số điện thoại, email (khi bạn đặt bàn hoặc liên hệ)
+                    </li>
+                    <li><strong>Thông tin đặt bàn:</strong> Ngày giờ, số khách, món ăn đặt trước, ghi chú</li>
+                    <li><strong>Cookie:</strong> Để ghi nhớ tùy chọn ngôn ngữ của bạn</li>
+                </ul>
+
+                <h3>2. Mục đích sử dụng</h3>
+                <ul>
+                    <li>Xử lý đơn đặt bàn và liên hệ xác nhận với bạn</li>
+                    <li>Phản hồi tin nhắn liên hệ của bạn</li>
+                    <li>Cải thiện chất lượng dịch vụ nhà hàng</li>
+                </ul>
+
+                <h3>3. Bảo vệ dữ liệu</h3>
+                <p>Chúng tôi cam kết bảo vệ thông tin cá nhân của bạn bằng các biện pháp:</p>
+                <ul>
+                    <li>🔒 Mã hóa dữ liệu truyền tải qua mạng</li>
+                    <li>🛡️ Bảo vệ chống tấn công XSS và SQL Injection</li>
+                    <li>⏰ Giới hạn số lượng yêu cầu để chống spam</li>
+                    <li>🔐 Xác thực quản trị viên bằng token bảo mật</li>
+                    <li>📝 Kiểm tra và lọc dữ liệu đầu vào</li>
+                </ul>
+
+                <h3>4. Quyền của bạn</h3>
+                <ul>
+                    <li>Yêu cầu xem, sửa đổi hoặc xóa thông tin cá nhân của bạn</li>
+                    <li>Từ chối cung cấp thông tin (một số tính năng có thể bị hạn chế)</li>
+                    <li>Liên hệ chúng tôi bất cứ lúc nào về vấn đề bảo mật dữ liệu</li>
+                </ul>
+
+                <h3>5. Chia sẻ thông tin</h3>
+                <p>Chúng tôi <strong>KHONG</strong> bán, trao đổi hoặc chia sẻ thông tin cá nhân của bạn với bất kỳ bên
+                    thứ ba nào, trừ khi được yêu cầu bởi pháp luật.</p>
+
+                <h3>6. Liên hệ</h3>
+                <p>Nếu bạn có bất kỳ câu hỏi nào về chính sách bảo mật, vui lòng liên hệ:</p>
+                <p><strong>Nhà Hàng Phố Cổ</strong><br>
+                    72A Đinh Tất Miễn – đường Lê Thái Tổ, Ninh Bình<br>
+                    Email: <a href="mailto:info@phoconinhbinh.vn">info@phoconinhbinh.vn</a></p>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

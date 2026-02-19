@@ -1,0 +1,26 @@
+{
+    "name": "nha-hang-pho-co",
+    "version": "1.0.0",
+    "description": "Website Nhà Hàng Phố Cổ - Ninh Bình",
+    "main": "server/server.js",
+    "scripts": {
+        "start": "node server/server.js",
+        "dev": "nodemon server/server.js"
+    },
+    "author": "Mphong",
+    "license": "ISC",
+    "dependencies": {
+        "cors": "^2.8.5",
+        "dotenv": "^16.4.5",
+        "express": "^4.21.0",
+        "express-rate-limit": "^8.2.1",
+        "express-validator": "^7.2.0",
+        "helmet": "^8.1.0",
+        "multer": "^2.0.2",
+        "mysql2": "^3.11.0",
+        "xss-filters": "^1.2.7"
+    },
+    "devDependencies": {
+        "nodemon": "^3.1.4"
+    }
+}

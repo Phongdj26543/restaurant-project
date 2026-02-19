@@ -1,0 +1,83 @@
+{
+  "hero": {
+    "subtitle": "Chào mừng đến với",
+    "title": "Nhà Hàng Phố Cổ",
+    "tagline": "Hương vị truyền thống giữa lòng phố cổ Ninh Bình",
+    "description": "Trải nghiệm ẩm thực đặc sản Ninh Bình trong không gian mang đậm hồn phố cổ",
+    "backgroundImage": ""
+  },
+  "about": {
+    "title": "Về Nhà Hàng Phố Cổ",
+    "description": "",
+    "image": "",
+    "experience": "10+"
+  },
+  "contact": {
+    "address": "72A Đinh Tất Miễn – đường Lê Thái Tổ, Ninh Bình",
+    "phone": "0886551556",
+    "email": "info@phoconinhbinh.vn",
+    "openHours": "10:00 - 22:00",
+    "mapUrl": "https://maps.google.com/maps?q=72A+%C4%90inh+T%E1%BA%A5t+Mi%E1%BB%85n,+%C4%91%C6%B0%E1%BB%9Dng+L%C3%AA+Th%C3%A1i+T%E1%BB%95,+Ninh+B%C3%ACnh,+Vietnam&t=&z=17&ie=UTF8&iwloc=&output=embed"
+  },
+  "introVideo": {
+    "url": "/uploads/vid_1771440008750_zs181h.mp4",
+    "enabled": true,
+    "muted": true
+  },
+  "gallery": [],
+  "stats": {
+    "customers": 15000,
+    "dishes": 50,
+    "years": 10,
+    "reviews": 4800
+  },
+  "testimonials": [
+    {
+      "name": "Nguyễn Minh Anh",
+      "role": "Khách du lịch từ Hà Nội",
+      "text": "Món thịt dê nướng tại đây tuyệt vời! Không gian rất đẹp và sang trọng. Nhân viên phục vụ rất chu đáo, chắc chắn sẽ quay lại.",
+      "stars": 5
+    },
+    {
+      "name": "Trần Văn Đức",
+      "role": "Food Blogger",
+      "text": "Cơm cháy ở đây giòn tan, nước sốt đậm đà đúng vị truyền thống. Lần nào đến Ninh Bình cũng ghé đây. Rất recommend!",
+      "stars": 5
+    },
+    {
+      "name": "Lê Thị Hương",
+      "role": "Doanh nhân tại Ninh Bình",
+      "text": "Nhà hàng sang trọng bậc nhất Ninh Bình! Tổ chức tiệc công ty ở đây rất hài lòng. Menu đa dạng, đồ ăn ngon, phục vụ chuyên nghiệp.",
+      "stars": 5
+    },
+    {
+      "name": "Park Min Jae",
+      "role": "Khách du lịch Hàn Quốc",
+      "text": "Amazing Vietnamese cuisine! The goat meat was perfectly cooked. Beautiful restaurant with traditional design. Highly recommended!",
+      "stars": 5
+    }
+  ],
+  "offer": {
+    "enabled": true,
+    "badge": "Ưu đãi đặc biệt",
+    "title": "Giảm 15% cho đặt bàn Online",
+    "desc": "Đặt bàn trực tuyến ngay hôm nay để nhận ưu đãi giảm giá 15% cho tất cả các món ăn. Áp dụng cho nhóm từ 4 người trở lên.",
+    "btnText": "Đặt Bàn & Nhận Ưu Đãi"
+  },
+  "floatingContact": {
+    "phone": "02293888888",
+    "zalo": "https://zalo.me/0229388888",
+    "messenger": "https://m.me/nhahangphoco"
+  },
+  "socialLinks": {
+    "facebook": "https://www.facebook.com/share/1Htfn7u5oC/?mibextid=wwXIfr",
+    "instagram": "https://www.instagram.com/mphogg_k6?igsh=MTdhN3NiNHZjbW85aQ%3D%3D&utm_source=qr",
+    "tiktok": "https://www.tiktok.com/@davidqc26?_r=1&_t=ZS-941nKaqyrem",
+    "zalo": "https://zalo.me/0229388888"
+  },
+  "footerHours": {
+    "weekday": "09:00 - 22:00",
+    "saturday": "08:00 - 23:00",
+    "sunday": "08:00 - 22:00"
+  }
+}

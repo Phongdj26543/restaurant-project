@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Nhà Hàng Phố Cổ</title>
+    <link rel="icon" type="image/svg+xml"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏮</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+
+<body>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <span class="sidebar-logo">🏮</span>
+            <div>
+                <h2>Phố Cổ</h2>
+                <small>Quản lý nhà hàng</small>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="#" class="nav-item active" data-tab="dashboard">
+                <i class="fas fa-chart-pie"></i> Tổng quan
+            </a>
+            <a href="#" class="nav-item" data-tab="reservations">
+                <i class="fas fa-calendar-check"></i> Đặt bàn
+                <span class="badge" id="resBadge">0</span>
+            </a>
+            <a href="#" class="nav-item" data-tab="contacts">
+                <i class="fas fa-envelope"></i> Liên hệ
+                <span class="badge" id="ctBadge">0</span>
+            </a>
+            <a href="#" class="nav-item" data-tab="menu-manage">
+                <i class="fas fa-utensils"></i> Thực đơn
+            </a>
+            <a href="#" class="nav-item" data-tab="analytics">
+                <i class="fas fa-chart-line"></i> Thống kê doanh số
+            </a>
+            <a href="#" class="nav-item" data-tab="content">
+                <i class="fas fa-paint-brush"></i> Nội dung web
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <a href="/" target="_blank"><i class="fas fa-external-link-alt"></i> Xem website</a>
+        </div>
+    </aside>
+
+    <!-- MOBILE HEADER -->
+    <header class="mobile-header">
+        <button class="menu-btn" id="menuBtn"><i class="fas fa-bars"></i></button>
+        <h2>🏮 Admin Phố Cổ</h2>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+
+        <!-- ===== TAB: DASHBOARD ===== -->
+        <section class="tab-panel active" id="tab-dashboard">
+            <div class="page-header">
+                <h1>Tổng quan</h1>
+                <p>Chào mừng đến trang quản lý Nhà Hàng Phố Cổ</p>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card stat-card--reservations">
+                    <div class="stat-icon"><i class="fas fa-calendar-check"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-number" id="statTotalRes">0</span>
+                        <span class="stat-label">Tổng đặt bàn</span>
+                    </div>
+                </div>
+                <div class="stat-card stat-card--pending">
+                    <div class="stat-icon"><i class="fas fa-clock"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-number" id="statPending">0</span>
+                        <span class="stat-label">Chờ xác nhận</span>
+                    </div>
+                </div>
+                <div class="stat-card stat-card--confirmed">
+                    <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-number" id="statConfirmed">0</span>
+                        <span class="stat-label">Đã xác nhận</span>
+                    </div>
+                </div>
+                <div class="stat-card stat-card--contacts">
+                    <div class="stat-icon"><i class="fas fa-envelope"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-number" id="statContacts">0</span>
+                        <span class="stat-label">Tin nhắn liên hệ</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Đặt bàn hôm nay -->
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-calendar-day"></i> Đặt bàn hôm nay</h3>
+                    <span class="today-date" id="todayDate"></span>
+                </div>
+                <div class="card-body">
+                    <div class="table-wrap">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Khách hàng</th>
+                                    <th>SĐT</th>
+                                    <th>Giờ</th>
+                                    <th>Số khách</th>
+                                    <th>Món đặt</th>
+                                    <th>Trạng thái</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="todayReservations">
+                                <tr>
+                                    <td colspan="7" class="empty-msg">Đang tải...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== TAB: RESERVATIONS ===== -->
+        <section class="tab-panel" id="tab-reservations">
+            <div class="page-header">
+                <h1>Quản lý Đặt Bàn</h1>
+                <div class="header-actions">
+                    <div class="filter-group">
+                        <label>Lọc ngày:</label>
+                        <input type="date" id="filterDate" class="input-field">
+                        <button class="btn btn-sm" id="filterBtn"><i class="fas fa-search"></i> Lọc</button>
+                        <button class="btn btn-sm btn-ghost" id="clearFilterBtn"><i class="fas fa-times"></i> Xóa
+                            lọc</button>
+                    </div>
+                    <button class="btn btn-sm btn-primary" id="refreshResBtn">
+                        <i class="fas fa-sync-alt"></i> Làm mới
+                    </button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-wrap">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Khách hàng</th>
+                                    <th>SĐT</th>
+                                    <th>Email</th>
+                                    <th>Ngày</th>
+                                    <th>Giờ</th>
+                                    <th>Số khách</th>
+                                    <th>Ghi chú</th>
+                                    <th>Món đặt trước</th>
+                                    <th>Trạng thái</th>
+                                    <th>Thời gian đặt</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="allReservations">
+                                <tr>
+                                    <td colspan="12" class="empty-msg">Đang tải...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== TAB: CONTACTS ===== -->
+        <section class="tab-panel" id="tab-contacts">
+            <div class="page-header">
+                <h1>Tin nhắn Liên hệ</h1>
+                <button class="btn btn-sm btn-primary" id="refreshCtBtn">
+                    <i class="fas fa-sync-alt"></i> Làm mới
+                </button>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-wrap">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Họ tên</th>
+                                    <th>Email</th>
+                                    <th>Tiêu đề</th>
+                                    <th>Nội dung</th>
+                                    <th>Thời gian</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="allContacts">
+                                <tr>
+                                    <td colspan="7" class="empty-msg">Đang tải...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== TAB: MENU MANAGE ===== -->
+        <section class="tab-panel" id="tab-menu-manage">
+            <div class="page-header">
+                <h1>Quản lý Thực đơn</h1>
+                <div class="header-actions">
+                    <button class="btn btn-sm btn-primary" id="addMenuBtn">
+                        <i class="fas fa-plus"></i> Thêm món mới
+                    </button>
+                    <button class="btn btn-sm" id="refreshMenuBtn">
+                        <i class="fas fa-sync-alt"></i> Làm mới
+                    </button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-wrap">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Hình</th>
+                                    <th>Tên món</th>
+                                    <th>Danh mục</th>
+                                    <th>Giá</th>
+                                    <th>Mô tả</th>
+                                    <th>Trạng thái</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="allMenuItems">
+                                <tr>
+                                    <td colspan="8" class="empty-msg">Đang tải...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== TAB: ANALYTICS ===== -->
+        <section class="tab-panel" id="tab-analytics">
+            <div class="page-header">
+                <h1><i class="fas fa-chart-line"></i> Thống Kê Doanh Số</h1>
+                <div class="header-actions">
+                    <div class="filter-group">
+                        <label>Khoảng thời gian:</label>
+                        <select class="input-field" id="analyticsPeriod" style="width:auto;">
+                            <option value="7">7 ngày qua</option>
+                            <option value="30" selected>30 ngày qua</option>
+                            <option value="90">3 tháng qua</option>
+                            <option value="365">1 năm qua</option>
+                            <option value="all">Tất cả</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-sm btn-primary" id="refreshAnalyticsBtn">
+                        <i class="fas fa-sync-alt"></i> Làm mới
+                    </button>
+                </div>
+            </div>
+
+            <!-- Revenue Stats Cards -->
+            <div class="stats-grid analytics-stats">
+                <div class="stat-card" style="border-left:4px solid #10B981;">
+                    <div class="stat-icon" style="background:rgba(16,185,129,0.12);color:#10B981;"><i
+                            class="fas fa-money-bill-wave"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-number" id="anTotalRevenue">0đ</span>
+                        <span class="stat-label">Tổng doanh thu (đặt trước)</span>
+                    </div>
+                </div>
+                <div class="stat-card" style="border-left:4px solid #3B82F6;">
+                    <div class="stat-icon" style="background:rgba(59,130,246,0.12);color:#3B82F6;"><i
+                            class="fas fa-receipt"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-number" id="anTotalOrders">0</span>
+                        <span class="stat-label">Đơn có đặt món trước</span>
+                    </div>
+                </div>
+                <div class="stat-card" style="border-left:4px solid #F59E0B;">
+                    <div class="stat-icon" style="background:rgba(245,158,11,0.12);color:#F59E0B;"><i
+                            class="fas fa-calculator"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-number" id="anAvgOrder">0đ</span>
+                        <span class="stat-label">Giá trị trung bình / đơn</span>
+                    </div>
+                </div>
+                <div class="stat-card" style="border-left:4px solid #8B5CF6;">
+                    <div class="stat-icon" style="background:rgba(139,92,246,0.12);color:#8B5CF6;"><i
+                            class="fas fa-users"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-number" id="anTotalGuests">0</span>
+                        <span class="stat-label">Tổng khách đã xác nhận</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Row -->
+            <div class="analytics-grid">
+                <!-- Revenue Chart -->
+                <div class="card analytics-card analytics-card--wide">
+                    <div class="card-header">
+                        <h3><i class="fas fa-chart-area"></i> Biểu Đồ Doanh Thu</h3>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="revenueChart" height="300"></canvas>
+                    </div>
+                </div>
+
+                <!-- Reservation Status Pie -->
+                <div class="card analytics-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-chart-pie"></i> Trạng Thái Đặt Bàn</h3>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="statusChart" height="260"></canvas>
+                        <div class="chart-legend" id="statusLegend"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Row -->
+            <div class="analytics-grid">
+                <!-- Top Dishes -->
+                <div class="card analytics-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-trophy"></i> Top Món Ăn Đặt Nhiều</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="top-dishes-list" id="topDishesList">
+                            <p class="empty-msg">Đang tải...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Revenue Table -->
+                <div class="card analytics-card analytics-card--wide">
+                    <div class="card-header">
+                        <h3><i class="fas fa-table"></i> Doanh Thu Theo Ngày</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-wrap">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Ngày</th>
+                                        <th>Số đơn</th>
+                                        <th>Số khách</th>
+                                        <th>Doanh thu đặt trước</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="dailyRevenueTable">
+                                    <tr>
+                                        <td colspan="4" class="empty-msg">Đang tải...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== TAB: CONTENT EDITOR ===== -->
+        <section class="tab-panel" id="tab-content">
+            <div class="page-header">
+                <h1>Quản lý Nội dung Website</h1>
+                <button class="btn btn-sm btn-primary" id="saveContentBtn">
+                    <i class="fas fa-save"></i> Lưu tất cả
+                </button>
+            </div>
+
+            <!-- Video Intro -->
+            <div class="card content-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-video"></i> Video Intro (Popup khi mở web)</h3>
+                </div>
+                <div class="card-body">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Bật/Tắt Video Intro</label>
+                            <select class="input-field" id="ct_videoEnabled">
+                                <option value="1">Bật - Hiện video khi mở web</option>
+                                <option value="0">Tắt - Không hiện video</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Âm thanh video</label>
+                            <select class="input-field" id="ct_videoMuted">
+                                <option value="1">Tắt tiếng (Muted) - Mặc định</option>
+                                <option value="0">Bật âm thanh (Unmuted)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Video (Upload trực tiếp - tối đa 100MB)</label>
+                            <div class="image-upload-group">
+                                <input type="text" class="input-field" id="ct_videoUrl" placeholder="Chưa có video..."
+                                    readonly>
+                                <label class="upload-btn" id="videoUploadLabel">
+                                    <i class="fas fa-cloud-upload-alt"></i> Upload Video
+                                    <input type="file" accept="video/mp4,video/webm,video/mov" id="videoFileInput"
+                                        hidden>
+                                </label>
+                            </div>
+                            <div class="video-upload-progress" id="videoProgress" style="display:none;">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="videoProgressFill"></div>
+                                </div>
+                                <span class="progress-text" id="videoProgressText">0%</span>
+                            </div>
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Xem trước</label>
+                            <div class="video-preview" id="videoPreview">
+                                <p class="empty-msg">Chưa có video. Upload video để xem trước.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hero Section -->
+            <div class="card content-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-image"></i> Hero Banner (Trang chủ)</h3>
+                </div>
+                <div class="card-body">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Tiêu đề phụ</label>
+                            <input type="text" class="input-field" id="ct_heroSubtitle" placeholder="Chào mừng đến với">
+                        </div>
+                        <div class="form-group">
+                            <label>Tiêu đề chính</label>
+                            <input type="text" class="input-field" id="ct_heroTitle" placeholder="Nhà Hàng Phố Cổ">
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Tagline</label>
+                            <input type="text" class="input-field" id="ct_heroTagline"
+                                placeholder="Hương vị truyền thống...">
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Mô tả</label>
+                            <textarea class="input-field" id="ct_heroDesc" rows="2"
+                                placeholder="Trải nghiệm ẩm thực..."></textarea>
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Ảnh nền Hero (URL hoặc upload)</label>
+                            <div class="image-upload-group">
+                                <input type="text" class="input-field" id="ct_heroBg"
+                                    placeholder="URL ảnh nền hoặc upload bên dưới">
+                                <label class="upload-btn">
+                                    <i class="fas fa-cloud-upload-alt"></i> Upload
+                                    <input type="file" accept="image/*" onchange="uploadImageFor('ct_heroBg', this)"
+                                        hidden>
+                                </label>
+                            </div>
+                            <div class="image-preview" id="preview_ct_heroBg"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- About Section -->
+            <div class="card content-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-info-circle"></i> Giới thiệu (About)</h3>
+                </div>
+                <div class="card-body">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Tiêu đề</label>
+                            <input type="text" class="input-field" id="ct_aboutTitle" placeholder="Về Nhà Hàng Phố Cổ">
+                        </div>
+                        <div class="form-group">
+                            <label>Kinh nghiệm (số năm)</label>
+                            <input type="text" class="input-field" id="ct_aboutExp" placeholder="15+">
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Mô tả giới thiệu</label>
+                            <textarea class="input-field" id="ct_aboutDesc" rows="4"
+                                placeholder="Nội dung giới thiệu nhà hàng..."></textarea>
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Ảnh giới thiệu</label>
+                            <div class="image-upload-group">
+                                <input type="text" class="input-field" id="ct_aboutImage"
+                                    placeholder="URL ảnh hoặc upload">
+                                <label class="upload-btn">
+                                    <i class="fas fa-cloud-upload-alt"></i> Upload
+                                    <input type="file" accept="image/*" onchange="uploadImageFor('ct_aboutImage', this)"
+                                        hidden>
+                                </label>
+                            </div>
+                            <div class="image-preview" id="preview_ct_aboutImage"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Info -->
+            <div class="card content-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-address-card"></i> Thông tin Liên hệ</h3>
+                </div>
+                <div class="card-body">
+                    <div class="form-grid">
+                        <div class="form-group full-width">
+                            <label>Địa chỉ</label>
+                            <input type="text" class="input-field" id="ct_address" placeholder="72A Đinh Tất Miễn...">
+                        </div>
+                        <div class="form-group">
+                            <label>Số điện thoại</label>
+                            <input type="text" class="input-field" id="ct_phone" placeholder="0229 123 4567">
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" class="input-field" id="ct_email" placeholder="info@phoconinhbinh.vn">
+                        </div>
+                        <div class="form-group">
+                            <label>Giờ mở cửa</label>
+                            <input type="text" class="input-field" id="ct_openHours" placeholder="10:00 - 22:00">
+                        </div>
+                        <div class="form-group">
+                            <label>Google Maps URL</label>
+                            <input type="text" class="input-field" id="ct_mapUrl"
+                                placeholder="https://maps.google.com/...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gallery -->
+            <div class="card content-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-images"></i> Gallery (Hình ảnh)</h3>
+                    <button class="btn btn-sm btn-primary" id="addGalleryBtn">
+                        <i class="fas fa-plus"></i> Thêm ảnh
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="gallery-admin-grid" id="galleryGrid">
+                        <p class="empty-msg">Chưa có ảnh nào trong gallery</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Counter -->
+            <div class="card content-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-chart-bar"></i> Thanh Thống Kê (Stats Counter)</h3>
+                </div>
+                <div class="card-body">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label><i class="fas fa-users" style="color:#D4AF37;margin-right:6px;"></i> Số khách hàng đã
+                                phục vụ</label>
+                            <input type="number" class="input-field" id="ct_statCustomers" placeholder="15000" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-utensils" style="color:#D4AF37;margin-right:6px;"></i> Số món ăn đặc
+                                sắc</label>
+                            <input type="number" class="input-field" id="ct_statDishes" placeholder="50" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-award" style="color:#D4AF37;margin-right:6px;"></i> Số năm kinh
+                                nghiệm</label>
+                            <input type="number" class="input-field" id="ct_statYears" placeholder="10" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-star" style="color:#D4AF37;margin-right:6px;"></i> Số đánh giá 5
+                                sao</label>
+                            <input type="number" class="input-field" id="ct_statReviews" placeholder="4800" min="0">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Testimonials -->
+            <div class="card content-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-quote-right"></i> Đánh giá khách hàng (Testimonials)</h3>
+                    <button class="btn btn-sm btn-primary" id="addTestimonialBtn">
+                        <i class="fas fa-plus"></i> Thêm đánh giá
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="testimonials-admin-list" id="testimonialsAdmin">
+                        <p class="empty-msg">Chưa có đánh giá nào</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Offer Banner -->
+            <div class="card content-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-tags"></i> Banner Ưu Đãi (Offer)</h3>
+                </div>
+                <div class="card-body">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Bật/Tắt Banner Ưu Đãi</label>
+                            <select class="input-field" id="ct_offerEnabled">
+                                <option value="1">Bật - Hiện banner ưu đãi</option>
+                                <option value="0">Tắt - Ẩn banner</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Badge (Nhãn nhỏ)</label>
+                            <input type="text" class="input-field" id="ct_offerBadge" placeholder="Ưu đãi đặc biệt">
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Tiêu đề ưu đãi</label>
+                            <input type="text" class="input-field" id="ct_offerTitle"
+                                placeholder="Giảm 15% cho đặt bàn Online">
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Mô tả ưu đãi</label>
+                            <textarea class="input-field" id="ct_offerDesc" rows="3"
+                                placeholder="Đặt bàn trực tuyến ngay hôm nay để nhận ưu đãi..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Nút bấm (Text)</label>
+                            <input type="text" class="input-field" id="ct_offerBtn" placeholder="Đặt Bàn & Nhận Ưu Đãi">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Floating Contact -->
+            <div class="card content-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-headset"></i> Nút Liên Hệ Nổi (Floating Contact)</h3>
+                </div>
+                <div class="card-body">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label><i class="fas fa-phone-alt" style="color:#25D366;margin-right:6px;"></i> Số điện
+                                thoại (Gọi ngay)</label>
+                            <input type="text" class="input-field" id="ct_floatPhone" placeholder="02293888888">
+                            <small style="color:#9CA3AF;">Nhập số điện thoại, VD: 02293888888</small>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-comment-dots" style="color:#0068FF;margin-right:6px;"></i> Link
+                                Zalo</label>
+                            <input type="text" class="input-field" id="ct_floatZalo"
+                                placeholder="https://zalo.me/0229388888">
+                            <small style="color:#9CA3AF;">VD: https://zalo.me/SĐT</small>
+                        </div>
+                        <div class="form-group full-width">
+                            <label><i class="fab fa-facebook-messenger" style="color:#0084FF;margin-right:6px;"></i>
+                                Link Messenger</label>
+                            <input type="text" class="input-field" id="ct_floatMessenger"
+                                placeholder="https://m.me/nhahangphoco">
+                            <small style="color:#9CA3AF;">VD: https://m.me/TenFanpage</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Social Media Links -->
+            <div class="card content-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-share-alt"></i> Mạng Xã Hội (Footer)</h3>
+                </div>
+                <div class="card-body">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label><i class="fab fa-facebook-f" style="color:#1877F2;margin-right:6px;"></i> Link
+                                Facebook</label>
+                            <input type="text" class="input-field" id="ct_socialFacebook"
+                                placeholder="https://facebook.com/...">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fab fa-instagram" style="color:#E4405F;margin-right:6px;"></i> Link
+                                Instagram</label>
+                            <input type="text" class="input-field" id="ct_socialInstagram"
+                                placeholder="https://instagram.com/...">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fab fa-tiktok" style="color:#000;margin-right:6px;"></i> Link
+                                TikTok</label>
+                            <input type="text" class="input-field" id="ct_socialTiktok"
+                                placeholder="https://tiktok.com/@...">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-comment-dots" style="color:#0068FF;margin-right:6px;"></i> Link
+                                Zalo</label>
+                            <input type="text" class="input-field" id="ct_socialZalo" placeholder="https://zalo.me/...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer Hours -->
+            <div class="card content-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-business-time"></i> Giờ Mở Cửa (Footer)</h3>
+                </div>
+                <div class="card-body">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Thứ 2 - Thứ 6</label>
+                            <input type="text" class="input-field" id="ct_hoursWeekday" placeholder="09:00 - 22:00">
+                        </div>
+                        <div class="form-group">
+                            <label>Thứ 7</label>
+                            <input type="text" class="input-field" id="ct_hoursSaturday" placeholder="08:00 - 23:00">
+                        </div>
+                        <div class="form-group">
+                            <label>Chủ nhật</label>
+                            <input type="text" class="input-field" id="ct_hoursSunday" placeholder="08:00 - 22:00">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ===== MENU FORM MODAL ===== -->
+    <div class="modal-overlay" id="menuModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3 id="menuModalTitle"><i class="fas fa-plus-circle"></i> Thêm món mới</h3>
+                <button class="modal-close" onclick="closeMenuModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="menuEditId">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Tên món <span class="required">*</span></label>
+                        <input type="text" class="input-field" id="menuName" placeholder="VD: Cơm cháy Ninh Bình">
+                    </div>
+                    <div class="form-group">
+                        <label>Danh mục <span class="required">*</span></label>
+                        <input type="text" class="input-field" id="menuCategory" list="categoryList"
+                            placeholder="VD: Đặc sản Ninh Bình">
+                        <datalist id="categoryList"></datalist>
+                    </div>
+                    <div class="form-group">
+                        <label>Giá (VNĐ) <span class="required">*</span></label>
+                        <input type="number" class="input-field" id="menuPrice" placeholder="VD: 120000" min="0"
+                            step="1000">
+                    </div>
+                    <div class="form-group">
+                        <label>Trạng thái</label>
+                        <select class="input-field" id="menuActive">
+                            <option value="1">Hiển thị</option>
+                            <option value="0">Ẩn</option>
+                        </select>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Mô tả</label>
+                        <textarea class="input-field" id="menuDesc" rows="3"
+                            placeholder="Mô tả ngắn về món ăn..."></textarea>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Hình ảnh</label>
+                        <div class="image-upload-group">
+                            <input type="text" class="input-field" id="menuImage" placeholder="URL ảnh hoặc upload">
+                            <label class="upload-btn">
+                                <i class="fas fa-cloud-upload-alt"></i> Upload
+                                <input type="file" accept="image/*" onchange="uploadImageFor('menuImage', this)" hidden>
+                            </label>
+                        </div>
+                        <div class="image-preview" id="preview_menuImage"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" onclick="closeMenuModal()">Hủy</button>
+                <button class="btn btn-primary" id="menuSaveBtn" onclick="saveMenuItem()">
+                    <i class="fas fa-save"></i> Lưu món
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- NOTIFICATION SOUND (optional) -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="js/admin.js"></script>
+</body>
+
+</html>

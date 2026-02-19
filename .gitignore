@@ -1,0 +1,10 @@
+node_modules/
+.env
+*.log
+.vercel/
+
+# Large video files (use CDN or cloud storage for videos)
+client/uploads/*.mp4
+client/uploads/*.webm
+client/uploads/*.mov
+client/uploads/*.avi
