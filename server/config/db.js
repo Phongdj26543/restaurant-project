@@ -86,11 +86,18 @@ const contentSchema = new mongoose.Schema({
     data: { type: mongoose.Schema.Types.Mixed, required: true }
 }, { timestamps: true });
 
+const imageSchema = new mongoose.Schema({
+    filename: { type: String, required: true },
+    contentType: { type: String, required: true },
+    data: { type: Buffer, required: true }
+}, { timestamps: true });
+
 // Tạo models
 const MenuModel = mongoose.model('Menu', menuSchema);
 const ReservationModel = mongoose.model('Reservation', reservationSchema);
 const ContactModel = mongoose.model('Contact', contactSchema);
 const ContentModel = mongoose.model('Content', contentSchema);
+const ImageModel = mongoose.model('Image', imageSchema);
 
 // =====================================================
 // JSON FILE STORAGE (fallback khi không có MongoDB)
@@ -248,5 +255,6 @@ module.exports = {
     MenuModel,
     ReservationModel,
     ContactModel,
-    ContentModel
+    ContentModel,
+    ImageModel
 };

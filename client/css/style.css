@@ -2356,11 +2356,15 @@ h4 {
 
 @media (max-width: 768px) {
     :root {
-        --header-height: 70px;
+        --header-height: 64px;
     }
 
     .section {
         padding: var(--space-3xl) 0;
+    }
+
+    .container {
+        padding: 0 16px;
     }
 
     .nav-toggle {
@@ -2376,7 +2380,7 @@ h4 {
         position: fixed;
         top: 0;
         right: -100%;
-        width: 300px;
+        width: 280px;
         height: 100vh;
         background: rgba(10, 10, 10, 0.99);
         backdrop-filter: blur(30px);
@@ -2396,7 +2400,7 @@ h4 {
     .lang-switcher {
         position: static;
         margin-left: auto;
-        margin-right: 16px;
+        margin-right: 12px;
         z-index: 1002;
     }
 
@@ -2421,32 +2425,66 @@ h4 {
         display: none;
     }
 
+    /* HERO - Mobile */
     .hero {
         min-height: 100vh;
+        min-height: 100dvh;
     }
 
     .hero-title {
-        font-size: 2.5rem;
-        letter-spacing: 3px;
+        font-size: 2rem;
+        letter-spacing: 2px;
+    }
+
+    .hero-subtitle {
+        font-size: 1.1rem;
+    }
+
+    .hero-tagline {
+        font-size: 0.78rem;
+        letter-spacing: 1.5px;
+    }
+
+    .hero-desc {
+        font-size: 0.85rem;
+        line-height: 1.7;
+    }
+
+    .hero-divider::before,
+    .hero-divider::after {
+        width: 40px;
     }
 
     .hero-buttons {
         flex-direction: column;
         align-items: center;
+        gap: 12px;
     }
 
     .hero-buttons .btn {
         width: 100%;
         max-width: 280px;
+        padding: 14px 30px;
+        font-size: 0.75rem;
     }
 
+    .hero-scroll {
+        bottom: 24px;
+    }
+
+    .hero-content {
+        padding: 0 20px;
+    }
+
+    /* ABOUT - Mobile */
     .about-grid {
         grid-template-columns: 1fr;
         gap: var(--space-2xl);
     }
 
     .about-image img {
-        height: 350px;
+        height: 280px;
+        border-radius: 4px;
     }
 
     .about-image::before {
@@ -2454,52 +2492,204 @@ h4 {
     }
 
     .about-badge {
-        right: 20px;
+        right: 10px;
+        bottom: 10px;
+        padding: 16px 20px;
+    }
+
+    .badge-number {
+        font-size: 2rem;
     }
 
     .about-features {
         grid-template-columns: 1fr;
+        gap: 8px;
     }
 
     .about-image-decor {
         display: none;
     }
 
+    .about-content h3 {
+        font-size: 1.2rem;
+    }
+
+    .about-content p {
+        font-size: 0.88rem;
+        line-height: 1.8;
+    }
+
+    /* SECTION HEADERS - Mobile */
+    .section-header {
+        margin-bottom: var(--space-2xl);
+    }
+
+    .section-title {
+        font-size: 1.5rem;
+        letter-spacing: 2px;
+    }
+
+    .section-subtitle {
+        font-size: 1rem;
+    }
+
+    .section-desc {
+        font-size: 0.88rem;
+    }
+
+    /* MENU - Mobile: Thiết kế card đẹp cho điện thoại */
     .menu-grid {
         grid-template-columns: 1fr;
+        gap: 16px;
     }
 
     .menu-filter {
         gap: 6px;
+        padding: 0 4px;
+        margin-bottom: var(--space-2xl);
+        justify-content: flex-start;
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+        padding-bottom: 4px;
+    }
+
+    .menu-filter::-webkit-scrollbar {
+        display: none;
     }
 
     .filter-btn {
-        padding: 8px 18px;
-        font-size: 0.68rem;
-        letter-spacing: 1.5px;
+        padding: 8px 16px;
+        font-size: 0.65rem;
+        letter-spacing: 1.2px;
+        white-space: nowrap;
+        flex-shrink: 0;
     }
 
+    .menu-card {
+        display: flex;
+        flex-direction: row;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .menu-card:hover {
+        transform: none;
+    }
+
+    .menu-card::before {
+        height: 100%;
+        width: 2px;
+        right: auto;
+        left: 0;
+        top: 0;
+        transform: scaleY(0);
+    }
+
+    .menu-card:hover::before {
+        transform: scaleY(1);
+    }
+
+    .menu-card-image {
+        width: 120px;
+        min-width: 120px;
+        height: auto;
+        min-height: 120px;
+    }
+
+    .menu-card-image img {
+        width: 100%;
+        height: 100%;
+        min-height: 120px;
+        object-fit: cover;
+    }
+
+    .menu-card-category {
+        top: 8px;
+        left: 8px;
+        padding: 3px 8px;
+        font-size: 0.5rem;
+        letter-spacing: 1px;
+    }
+
+    .menu-card-body {
+        padding: 12px 14px 8px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        flex: 1;
+    }
+
+    .menu-card-name {
+        font-size: 0.95rem;
+        margin-bottom: 4px;
+    }
+
+    .menu-card-desc {
+        font-size: 0.75rem;
+        line-height: 1.5;
+        margin-bottom: 8px;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+    }
+
+    .menu-card-footer {
+        padding: 0;
+        justify-content: flex-start;
+    }
+
+    .menu-card-price {
+        font-size: 1rem;
+    }
+
+    /* GALLERY - Mobile */
     .gallery-grid {
-        grid-template-columns: 1fr;
-        gap: 2px;
+        grid-template-columns: 1fr 1fr;
+        gap: 3px;
     }
 
     .gallery-item--large {
         grid-row: span 1;
     }
 
+    .gallery-item {
+        aspect-ratio: 1 / 1;
+    }
+
+    /* RESERVATION FORM - Mobile */
     .form-grid {
         grid-template-columns: 1fr;
+        gap: 14px;
     }
 
     .reservation-form {
-        padding: var(--space-xl);
+        padding: 20px 16px;
     }
 
+    .form-group label {
+        font-size: 0.68rem;
+        margin-bottom: 6px;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        padding: 12px 14px;
+        font-size: 0.88rem;
+    }
+
+    .btn-submit {
+        padding: 14px;
+        font-size: 0.78rem;
+    }
+
+    /* CONTACT - Mobile */
     .contact-grid {
         grid-template-columns: 1fr;
     }
 
+    /* FOOTER - Mobile */
     .footer-grid {
         grid-template-columns: 1fr;
         gap: var(--space-xl);
@@ -2511,48 +2701,198 @@ h4 {
         text-align: center;
     }
 
+    /* STATS - Mobile */
+    .stats-container {
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--space-md);
+    }
+
+    .stat-item {
+        padding: var(--space-md) var(--space-sm);
+    }
+
+    .stat-item:not(:last-child)::after {
+        display: none;
+    }
+
+    .stat-number {
+        font-size: 2rem;
+    }
+
+    .stat-label {
+        font-size: 0.62rem;
+        letter-spacing: 2px;
+    }
+
+    .stat-icon {
+        font-size: 1.2rem;
+        margin-bottom: var(--space-sm);
+    }
+
+    /* TESTIMONIALS - Mobile */
+    .testimonial-text {
+        font-size: 0.95rem;
+        line-height: 1.8;
+    }
+
+    .testimonial-card {
+        padding: 0 var(--space-sm);
+    }
+
+    /* OFFER - Mobile */
+    .offer-title {
+        font-size: 1.4rem;
+    }
+
+    .offer-desc {
+        font-size: 0.88rem;
+    }
+
+    /* FLOATING CONTACT - Mobile */
+    .floating-contact {
+        bottom: 16px;
+        left: 16px;
+    }
+
+    .floating-main-btn {
+        width: 48px;
+        height: 48px;
+        font-size: 1.1rem;
+    }
+
+    /* BACK TO TOP - Mobile */
     .back-to-top {
-        bottom: 20px;
-        right: 20px;
+        bottom: 16px;
+        right: 16px;
+        width: 38px;
+        height: 38px;
+    }
+
+    /* LIGHTBOX - Mobile */
+    .lightbox-prev,
+    .lightbox-next {
+        width: 36px;
+        height: 36px;
+        font-size: 0.8rem;
+    }
+
+    .lightbox-prev {
+        left: 8px;
+    }
+
+    .lightbox-next {
+        right: 8px;
+    }
+
+    .lightbox-close {
+        top: 12px;
+        right: 12px;
         width: 40px;
         height: 40px;
     }
-}
 
-@media (max-width: 480px) {
-    .container {
-        padding: 0 var(--space-md);
+    /* VIDEO CONTROLS - Mobile */
+    .hero-video-controls {
+        bottom: 70px;
+        right: 12px;
+        gap: 6px;
     }
 
+    .hero-video-btn {
+        padding: 8px 12px;
+        font-size: 0.65rem;
+        letter-spacing: 1px;
+    }
+
+    /* ORDER SECTION - Mobile */
+    .order-menu-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .order-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    /* PRELOADER - Mobile */
+    .preloader-name {
+        font-size: 1.5rem;
+        letter-spacing: 3px;
+    }
+
+    .preloader-icon {
+        font-size: 2.8rem;
+    }
+
+    /* COOKIE - Mobile */
+    .cookie-content {
+        flex-direction: column;
+        text-align: center;
+        gap: 12px;
+    }
+
+    .cookie-text {
+        flex-direction: column;
+    }
+
+    .cookie-actions {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* Extra small phones */
+@media (max-width: 380px) {
     .hero-title {
-        font-size: 1.8rem;
-        letter-spacing: 2px;
+        font-size: 1.6rem;
+        letter-spacing: 1px;
     }
 
     .hero-subtitle {
-        font-size: 1rem;
+        font-size: 0.95rem;
     }
 
-    .hero-tagline {
-        font-size: 0.8rem;
-        letter-spacing: 2px;
+    .hero-buttons .btn {
+        max-width: 240px;
+        padding: 12px 24px;
+        font-size: 0.7rem;
+    }
+
+    .menu-card-image {
+        width: 100px;
+        min-width: 100px;
+    }
+
+    .menu-card-name {
+        font-size: 0.85rem;
+    }
+
+    .menu-card-price {
+        font-size: 0.88rem;
+    }
+
+    .menu-card-desc {
+        font-size: 0.7rem;
     }
 
     .section-title {
-        font-size: 1.5rem;
-        letter-spacing: 2px;
+        font-size: 1.3rem;
     }
 
-    .about-content h3 {
-        font-size: 1.2rem;
+    .stat-number {
+        font-size: 1.6rem;
     }
 
-    .reservation-form {
-        padding: var(--space-lg);
+    .logo-name {
+        font-size: 1rem;
     }
 
-    .contact-form-wrap {
-        padding: var(--space-lg);
+    .logo-sub {
+        font-size: 0.75rem;
+    }
+
+    .logo-icon {
+        font-size: 1.8rem;
     }
 }
 
@@ -2686,19 +3026,6 @@ body:has(.hero--video-playing) .header {
     }
 }
 
-@media (max-width: 768px) {
-    .hero-video-controls {
-        bottom: 80px;
-        right: 16px;
-        gap: 6px;
-    }
-
-    .hero-video-btn {
-        padding: 8px 14px;
-        font-size: 0.68rem;
-        letter-spacing: 1px;
-    }
-}
 
 /* =====================================================
    SCROLLBAR - LUXURY
@@ -3394,73 +3721,6 @@ body:has(.hero--video-playing) .header {
     font-size: 0.78rem;
     letter-spacing: 3px;
     font-weight: 600;
-}
-
-/* =====================================================
-   RESPONSIVE - NEW FEATURES
-   ===================================================== */
-@media (max-width: 768px) {
-    .stats-container {
-        grid-template-columns: repeat(2, 1fr);
-        gap: var(--space-lg);
-    }
-
-    .stat-item:not(:last-child)::after {
-        display: none;
-    }
-
-    .stat-number {
-        font-size: 2.2rem;
-    }
-
-    .testimonial-text {
-        font-size: 1rem;
-    }
-
-    .offer-title {
-        font-size: 1.5rem;
-    }
-
-    .floating-contact {
-        bottom: 20px;
-        left: 20px;
-    }
-
-    .floating-main-btn {
-        width: 48px;
-        height: 48px;
-        font-size: 1.1rem;
-    }
-
-    .lightbox-prev,
-    .lightbox-next {
-        width: 36px;
-        height: 36px;
-        font-size: 0.8rem;
-    }
-
-    .lightbox-prev {
-        left: 10px;
-    }
-
-    .lightbox-next {
-        right: 10px;
-    }
-}
-
-@media (max-width: 480px) {
-    .stats-container {
-        grid-template-columns: 1fr 1fr;
-    }
-
-    .stat-number {
-        font-size: 1.8rem;
-    }
-
-    .stat-label {
-        font-size: 0.62rem;
-        letter-spacing: 2px;
-    }
 }
 
 /* =====================================================

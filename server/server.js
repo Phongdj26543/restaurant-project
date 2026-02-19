@@ -12,7 +12,7 @@ const fs = require('fs');
 const rateLimit = require('express-rate-limit');
 const multer = require('multer');
 const xssFilters = require('xss-filters');
-const { testConnection, jsonDB, isMongo, ContentModel, ReservationModel } = require('./config/db');
+const { testConnection, jsonDB, isMongo, ContentModel, ReservationModel, ImageModel } = require('./config/db');
 
 // Import routes
 const menuRoutes = require('./routes/menuRoutes');
@@ -132,6 +132,22 @@ if (IS_VERCEL) {
 // =====================================================
 // IMAGE UPLOAD (Multer)
 // =====================================================
+
+// Memory storage for MongoDB image persistence
+const memoryUploadStorage = multer.memoryStorage();
+const memoryUpload = multer({
+    storage: memoryUploadStorage,
+    limits: { fileSize: 5 * 1024 * 1024 }, // 5MB max
+    fileFilter: (req, file, cb) => {
+        const allowed = /jpeg|jpg|png|gif|webp|svg/;
+        const ext = allowed.test(path.extname(file.originalname).toLowerCase());
+        const mime = allowed.test(file.mimetype);
+        if (ext && mime) cb(null, true);
+        else cb(new Error('Chỉ chấp nhận file ảnh (jpg, png, gif, webp, svg)'));
+    }
+});
+
+// Disk storage fallback (for local development without MongoDB)
 const storage = multer.diskStorage({
     destination: (req, file, cb) => cb(null, UPLOADS_DIR),
     filename: (req, file, cb) => {
@@ -152,11 +168,52 @@ const upload = multer({
     }
 });
 
-// API Upload ảnh (yêu cầu admin)
-app.post('/api/upload', requireAdmin, upload.single('image'), (req, res) => {
-    if (!req.file) return res.status(400).json({ success: false, message: 'Không có file ảnh' });
-    const url = `/uploads/${req.file.filename}`;
-    res.json({ success: true, url, message: 'Upload thành công' });
+// API Upload ảnh (yêu cầu admin) - Lưu vào MongoDB nếu có, disk nếu không
+app.post('/api/upload', requireAdmin, (req, res, next) => {
+    if (isMongo()) {
+        memoryUpload.single('image')(req, res, next);
+    } else {
+        upload.single('image')(req, res, next);
+    }
+}, async (req, res) => {
+    try {
+        if (!req.file) return res.status(400).json({ success: false, message: 'Không có file ảnh' });
+
+        if (isMongo()) {
+            // Lưu ảnh vào MongoDB
+            const imageDoc = await ImageModel.create({
+                filename: req.file.originalname,
+                contentType: req.file.mimetype,
+                data: req.file.buffer
+            });
+            const url = `/api/images/${imageDoc._id}`;
+            res.json({ success: true, url, message: 'Upload thành công (MongoDB)' });
+        } else {
+            // Lưu vào disk (fallback)
+            const url = `/uploads/${req.file.filename}`;
+            res.json({ success: true, url, message: 'Upload thành công' });
+        }
+    } catch (error) {
+        console.error('Upload error:', error);
+        res.status(500).json({ success: false, message: 'Lỗi upload ảnh' });
+    }
+});
+
+// API Serve ảnh từ MongoDB
+app.get('/api/images/:id', async (req, res) => {
+    try {
+        const imageDoc = await ImageModel.findById(req.params.id);
+        if (!imageDoc) {
+            return res.status(404).json({ success: false, message: 'Không tìm thấy ảnh' });
+        }
+        // Cache ảnh 30 ngày
+        res.set('Cache-Control', 'public, max-age=2592000');
+        res.set('Content-Type', imageDoc.contentType);
+        res.send(imageDoc.data);
+    } catch (error) {
+        console.error('Serve image error:', error);
+        res.status(500).json({ success: false, message: 'Lỗi tải ảnh' });
+    }
 });
 
 // =====================================================
