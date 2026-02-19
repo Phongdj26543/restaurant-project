@@ -11,41 +11,94 @@ require('dotenv').config();
 
 let useMongo = false;
 let mongoConnected = false;
+let mongoConnectionError = '';
 
 // =====================================================
-// MONGODB CONNECTION
+// MONGODB CONNECTION (với retry cho Vercel cold start)
 // =====================================================
 const MONGODB_URI = process.env.MONGODB_URI || '';
 
-async function connectMongoDB() {
+async function connectMongoDB(retryCount = 0) {
+    const MAX_RETRIES = 3;
     if (!MONGODB_URI) {
-        console.log('⚠️  MONGODB_URI không được cấu hình');
+        mongoConnectionError = 'MONGODB_URI không được cấu hình';
+        console.log('⚠️  ' + mongoConnectionError);
         return false;
     }
     try {
+        // Nếu đã kết nối rồi thì dùng luôn
         if (mongoose.connection.readyState === 1) {
             useMongo = true;
             mongoConnected = true;
+            mongoConnectionError = '';
             return true;
         }
+
+        console.log(`🔌 Đang kết nối MongoDB... (lần ${retryCount + 1}/${MAX_RETRIES + 1})`);
+
         await mongoose.connect(MONGODB_URI, {
-            serverSelectionTimeoutMS: 5000,
+            serverSelectionTimeoutMS: 15000,  // 15s cho Vercel cold start
             socketTimeoutMS: 45000,
+            connectTimeoutMS: 15000,
+            maxPoolSize: 5,                   // Giới hạn pool cho serverless
+            minPoolSize: 1,
         });
+
         console.log('✅ Kết nối MongoDB thành công!');
         useMongo = true;
         mongoConnected = true;
+        mongoConnectionError = '';
 
         // Seed dữ liệu mẫu nếu DB trống
         await seedInitialData();
 
         return true;
     } catch (error) {
-        console.error('❌ Không thể kết nối MongoDB:', error.message);
+        mongoConnectionError = error.message;
+        console.error(`❌ Lỗi kết nối MongoDB (lần ${retryCount + 1}):`, error.message);
+
+        // Retry logic
+        if (retryCount < MAX_RETRIES) {
+            const delay = (retryCount + 1) * 2000; // 2s, 4s, 6s
+            console.log(`⏳ Thử lại sau ${delay / 1000}s...`);
+            await new Promise(r => setTimeout(r, delay));
+            return connectMongoDB(retryCount + 1);
+        }
+
+        console.error('❌ Đã thử', MAX_RETRIES + 1, 'lần - MongoDB không kết nối được');
         useMongo = false;
         mongoConnected = false;
         return false;
     }
+}
+
+// Lắng nghe sự kiện kết nối MongoDB
+mongoose.connection.on('connected', () => {
+    console.log('📡 MongoDB connected event');
+    useMongo = true;
+    mongoConnected = true;
+});
+
+mongoose.connection.on('disconnected', () => {
+    console.log('⚠️ MongoDB disconnected event');
+    mongoConnected = false;
+});
+
+mongoose.connection.on('error', (err) => {
+    console.error('❌ MongoDB error event:', err.message);
+    mongoConnectionError = err.message;
+});
+
+// Export trạng thái để health check
+function getDbStatus() {
+    return {
+        mongoConfigured: !!MONGODB_URI,
+        mongoConnected: useMongo && mongoConnected,
+        mongoState: ['disconnected', 'connected', 'connecting', 'disconnecting'][mongoose.connection.readyState] || 'unknown',
+        mongoError: mongoConnectionError || null,
+        usingMongo: isMongo(),
+        mongoUri: MONGODB_URI ? MONGODB_URI.replace(/\/\/([^:]+):([^@]+)@/, '//$1:***@') : 'not set'
+    };
 }
 
 // =====================================================
@@ -245,12 +298,21 @@ function initJSONData() {
     if (!fs.existsSync(DB_FILES.contacts)) writeJSON(DB_FILES.contacts, []);
 }
 
-function isMongo() { return useMongo && mongoConnected; }
+function isMongo() {
+    // Kiểm tra cả readyState để đảm bảo connection thực sự sống
+    const ready = mongoose.connection.readyState === 1;
+    if (useMongo && !ready) {
+        console.warn('⚠️ isMongo: useMongo=true nhưng readyState=' + mongoose.connection.readyState);
+        mongoConnected = false;
+    }
+    return useMongo && ready;
+}
 
 module.exports = {
     testConnection,
     jsonDB,
     isMongo,
+    getDbStatus,
     // Mongoose models export
     MenuModel,
     ReservationModel,

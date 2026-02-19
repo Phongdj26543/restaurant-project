@@ -589,7 +589,7 @@ async function loadMenuItems() {
     tbody.innerHTML = '<tr><td colspan="8" class="empty-msg">Đang tải...</td></tr>';
 
     try {
-        const res = await fetch(`${API}/menu/all`);
+        const res = await fetch(`${API}/menu/all?_t=${Date.now()}`);
         const data = await res.json();
         const list = data.success ? data.data : [];
 
@@ -673,7 +673,7 @@ window.closeMenuModal = closeMenuModal;
 
 async function editMenuItem(id) {
     try {
-        const res = await fetch(`${API}/menu/${id}`);
+        const res = await fetch(`${API}/menu/${id}?_t=${Date.now()}`);
         const data = await res.json();
         if (data.success) openMenuModal(data.data);
         else showToast('Không tìm thấy món', 'error');
@@ -1699,7 +1699,25 @@ function formatCompact(num) {
 // =====================================================
 function initDashboard() {
     loadDashboard();
+    checkDbStatus();
     console.log('🏮 Admin Dashboard loaded');
+}
+
+// Kiểm tra trạng thái MongoDB
+async function checkDbStatus() {
+    try {
+        const res = await fetch(`${API}/health?_t=${Date.now()}`);
+        const data = await res.json();
+        console.log('[Health Check]', data);
+        if (data.database && !data.database.mongoConnected) {
+            showToast('⚠️ MongoDB chưa kết nối! Dữ liệu sẽ KHÔNG được lưu vĩnh viễn. Kiểm tra Network Access trên MongoDB Atlas.', 'error');
+            console.error('[DB Status] MongoDB NOT connected:', data.database);
+        } else if (data.database && data.database.mongoConnected) {
+            console.log('[DB Status] MongoDB connected OK ✅');
+        }
+    } catch (e) {
+        console.error('[Health Check] Error:', e);
+    }
 }
 
 document.addEventListener('DOMContentLoaded', () => {

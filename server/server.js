@@ -12,7 +12,7 @@ const fs = require('fs');
 const rateLimit = require('express-rate-limit');
 const multer = require('multer');
 const xssFilters = require('xss-filters');
-const { testConnection, jsonDB, isMongo, ContentModel, ReservationModel, ImageModel } = require('./config/db');
+const { testConnection, jsonDB, isMongo, getDbStatus, ContentModel, ReservationModel, ImageModel } = require('./config/db');
 
 // Import routes
 const menuRoutes = require('./routes/menuRoutes');
@@ -423,9 +423,19 @@ app.use('/api/contacts', noCache, contactRoutes);
 app.post('/api/reservations', formLimiter);
 app.post('/api/contacts', formLimiter);
 
-// Health check
+// Health check - hiển thị trạng thái DB để chẩn đoán
 app.get('/api/health', (req, res) => {
-    res.json({ status: 'ok', message: 'Nhà Hàng Phố Cổ API is running' });
+    const dbStatus = getDbStatus();
+    res.json({
+        status: dbStatus.mongoConnected ? 'ok' : 'degraded',
+        message: 'Nhà Hàng Phố Cổ API is running',
+        database: dbStatus,
+        env: {
+            isVercel: process.env.VERCEL === '1',
+            nodeEnv: process.env.NODE_ENV || 'development'
+        },
+        timestamp: new Date().toISOString()
+    });
 });
 
 // =====================================================
