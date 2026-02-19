@@ -698,25 +698,41 @@ async function saveMenuItem() {
 
     const body = { name, category, price: Number(price), description, image, is_active };
 
+    // Disable save button to prevent double-click
+    const saveBtn = $('#menuSaveBtn');
+    if (saveBtn) {
+        saveBtn.disabled = true;
+        saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang lưu...';
+    }
+
     try {
         const url = id ? `${API}/menu/${id}` : `${API}/menu`;
         const method = id ? 'PUT' : 'POST';
+        console.log(`[Menu Save] ${method} ${url}`, body);
         const res = await fetch(url, {
             method,
             headers: authHeaders(),
             body: JSON.stringify(body)
         });
         const data = await res.json();
+        console.log('[Menu Save] Response:', data);
         if (data.success) {
-            showToast(id ? 'Đã cập nhật món' : 'Đã thêm món mới', 'success');
+            showToast(id ? 'Đã cập nhật món thành công!' : 'Đã thêm món mới thành công!', 'success');
             closeMenuModal();
             loadMenuItems();
         } else {
-            showToast(data.message || 'Lỗi lưu', 'error');
+            showToast(data.message || 'Lỗi lưu món ăn', 'error');
+            console.error('[Menu Save] Server error:', data);
         }
     } catch (error) {
-        console.error('Save menu error:', error);
-        showToast('Lỗi kết nối server', 'error');
+        console.error('[Menu Save] Network error:', error);
+        showToast('Lỗi kết nối server - kiểm tra console để xem chi tiết', 'error');
+    } finally {
+        // Re-enable save button
+        if (saveBtn) {
+            saveBtn.disabled = false;
+            saveBtn.innerHTML = '<i class="fas fa-save"></i> Lưu món';
+        }
     }
 }
 
@@ -776,24 +792,50 @@ async function uploadImageFor(inputId, fileInput) {
         return;
     }
 
+    // Check auth token
+    if (!adminToken) {
+        showToast('Phiên đăng nhập hết hạn, vui lòng đăng nhập lại', 'error');
+        fileInput.value = '';
+        return;
+    }
+
     const formData = new FormData();
     formData.append('image', file);
 
     showToast('Đang upload ảnh...', 'info');
 
     try {
-        const res = await fetch(`${API}/upload`, { method: 'POST', body: formData, headers: { 'Authorization': `Bearer ${adminToken}` } });
+        console.log('[Upload] Uploading file:', file.name, 'Size:', file.size, 'Type:', file.type);
+        const res = await fetch(`${API}/upload`, {
+            method: 'POST',
+            body: formData,
+            headers: { 'Authorization': `Bearer ${adminToken}` }
+        });
+
+        if (!res.ok) {
+            const errText = await res.text();
+            console.error('[Upload] Server responded with', res.status, errText);
+            if (res.status === 401) {
+                showToast('Phiên đăng nhập hết hạn, vui lòng đăng nhập lại', 'error');
+            } else {
+                showToast(`Upload thất bại (HTTP ${res.status})`, 'error');
+            }
+            fileInput.value = '';
+            return;
+        }
+
         const data = await res.json();
-        if (data.success) {
+        console.log('[Upload] Response:', data);
+        if (data.success && data.url) {
             $(`#${inputId}`).value = data.url;
             showImagePreview(inputId, data.url);
-            showToast('Upload thành công!', 'success');
+            showToast('Upload ảnh thành công! Nhấn "Lưu món" để lưu thay đổi.', 'success');
         } else {
-            showToast(data.message || 'Upload thất bại', 'error');
+            showToast(data.message || 'Upload thất bại - không nhận được URL ảnh', 'error');
         }
     } catch (error) {
-        console.error('Upload error:', error);
-        showToast('Lỗi upload ảnh', 'error');
+        console.error('[Upload] Network error:', error);
+        showToast('Lỗi kết nối server khi upload ảnh', 'error');
     }
     fileInput.value = '';
 }

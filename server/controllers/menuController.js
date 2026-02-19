@@ -120,6 +120,7 @@ const menuController = {
     async updateMenuItem(req, res) {
         try {
             const { name, description, price, image, category, is_active } = req.body;
+            console.log(`[Menu Update] ID: ${req.params.id}, Body:`, { name, description, price, image, category, is_active });
             const updates = {};
             if (name !== undefined) updates.name = name;
             if (description !== undefined) updates.description = description;
@@ -128,10 +129,13 @@ const menuController = {
             if (category !== undefined) updates.category = category;
             if (is_active !== undefined) updates.is_active = Number(is_active);
 
+            console.log(`[Menu Update] Updates to apply:`, updates);
             const item = await Menu.update(req.params.id, updates);
             if (!item) {
+                console.log(`[Menu Update] Item not found: ${req.params.id}`);
                 return res.status(404).json({ success: false, message: 'Không tìm thấy món ăn' });
             }
+            console.log(`[Menu Update] Success:`, item);
             res.json({ success: true, data: item, message: 'Đã cập nhật món' });
         } catch (error) {
             console.error('Lỗi cập nhật món:', error);

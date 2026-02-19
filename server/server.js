@@ -22,6 +22,10 @@ const contactRoutes = require('./routes/contactRoutes');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Promise để đợi kết nối DB sẵn sàng (quan trọng cho Vercel cold start)
+let dbReadyPromise = null;
+let dbInitDone = false;
+
 // =====================================================
 // MIDDLEWARE
 // =====================================================
@@ -92,6 +96,9 @@ function requireAdmin(req, res, next) {
     }
 }
 
+// Export requireAdmin để dùng trong routes
+app.locals.requireAdmin = requireAdmin;
+
 // Rate limiting - chống spam API
 const apiLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 phút
@@ -108,6 +115,22 @@ const formLimiter = rateLimit({
     message: { success: false, message: 'Bạn đã gửi quá nhiều lần, vui lòng thử lại sau' },
     standardHeaders: true,
     legacyHeaders: false
+});
+
+// =====================================================
+// WAIT FOR DB CONNECTION (quan trọng cho Vercel cold start)
+// Đảm bảo MongoDB đã kết nối trước khi xử lý API request
+// =====================================================
+app.use('/api', async (req, res, next) => {
+    if (!dbInitDone && dbReadyPromise) {
+        try {
+            await dbReadyPromise;
+        } catch (e) {
+            console.error('DB connection wait error:', e.message);
+        }
+        dbInitDone = true;
+    }
+    next();
 });
 
 // Serve static files (Frontend)
@@ -170,6 +193,7 @@ const upload = multer({
 
 // API Upload ảnh (yêu cầu admin) - Lưu vào MongoDB nếu có, disk nếu không
 app.post('/api/upload', requireAdmin, (req, res, next) => {
+    console.log('[Upload] isMongo:', isMongo(), '| File incoming...');
     if (isMongo()) {
         memoryUpload.single('image')(req, res, next);
     } else {
@@ -179,6 +203,8 @@ app.post('/api/upload', requireAdmin, (req, res, next) => {
     try {
         if (!req.file) return res.status(400).json({ success: false, message: 'Không có file ảnh' });
 
+        console.log('[Upload] File received:', req.file.originalname, 'Size:', req.file.size, 'Type:', req.file.mimetype);
+
         if (isMongo()) {
             // Lưu ảnh vào MongoDB
             const imageDoc = await ImageModel.create({
@@ -187,10 +213,12 @@ app.post('/api/upload', requireAdmin, (req, res, next) => {
                 data: req.file.buffer
             });
             const url = `/api/images/${imageDoc._id}`;
+            console.log('[Upload] Saved to MongoDB, URL:', url);
             res.json({ success: true, url, message: 'Upload thành công (MongoDB)' });
         } else {
             // Lưu vào disk (fallback)
             const url = `/uploads/${req.file.filename}`;
+            console.log('[Upload] Saved to disk, URL:', url, 'Dir:', UPLOADS_DIR);
             res.json({ success: true, url, message: 'Upload thành công' });
         }
     } catch (error) {
@@ -543,8 +571,8 @@ if (!isVercel) {
     }
     startServer();
 } else {
-    // On Vercel, just test connection without listen
-    testConnection();
+    // On Vercel, lưu promise để middleware waitForDB có thể await
+    dbReadyPromise = testConnection();
 }
 
 // Export app for Vercel serverless
