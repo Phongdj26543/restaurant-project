@@ -8,3 +8,4 @@ client/uploads/*.mp4
 client/uploads/*.webm
 client/uploads/*.mov
 client/uploads/*.avi
+.vercel

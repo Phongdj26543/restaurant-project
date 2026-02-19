@@ -1022,7 +1022,7 @@ async function loadDynamicContent() {
 
         // Video Intro
         if (ct.introVideo && ct.introVideo.enabled && ct.introVideo.url) {
-            const videoMuted = ct.introVideo.muted !== false;
+            const videoMuted = false; // Mặc định phát có âm thanh
             showVideoIntro(ct.introVideo.url, videoMuted);
         }
 
@@ -1210,25 +1210,54 @@ function showVideoIntro(videoUrl, startMuted) {
 
     if (!heroVideo || !hero) return;
 
-    // Set mute state
+    // Mặc định phát có âm thanh
     heroVideo.muted = startMuted;
     updateMuteIcon(muteBtn, heroVideo.muted);
 
     heroVideo.src = videoUrl;
-    heroVideo.loop = false;
+    heroVideo.loop = true; // Lặp lại video liên tục
+    heroVideo.preload = 'auto';
     heroVideo.load();
 
-    heroVideo.addEventListener('canplay', () => {
+    function playVideo() {
         heroVideo.classList.add('active');
+        heroVideo.classList.remove('fading');
         hero.classList.add('hero--video-playing');
         if (controls) controls.style.display = 'flex';
         heroVideo.play().catch(() => {
-            // Autoplay blocked? Try muted
+            // Autoplay bị chặn? Thử muted trước
             heroVideo.muted = true;
             updateMuteIcon(muteBtn, true);
             heroVideo.play().catch(() => { });
         });
+    }
+
+    heroVideo.addEventListener('canplay', () => {
+        playVideo();
     }, { once: true });
+
+    // Khi quay lại tab/app -> tự động phát lại video
+    document.addEventListener('visibilitychange', () => {
+        if (!heroVideo.src || !heroVideo.classList.contains('active')) return;
+        if (document.hidden) {
+            // Rời tab -> tạm dừng
+            heroVideo.pause();
+        } else {
+            // Quay lại tab -> phát lại
+            heroVideo.play().catch(() => {
+                heroVideo.muted = true;
+                updateMuteIcon(muteBtn, true);
+                heroVideo.play().catch(() => { });
+            });
+        }
+    });
+
+    // Khi focus lại trang (bổ sung cho mobile)
+    window.addEventListener('focus', () => {
+        if (heroVideo.src && heroVideo.classList.contains('active') && heroVideo.paused) {
+            heroVideo.play().catch(() => { });
+        }
+    });
 
     function stopVideo() {
         heroVideo.classList.add('fading');
@@ -1257,9 +1286,6 @@ function showVideoIntro(videoUrl, startMuted) {
 
     // Skip button
     if (skipBtn) skipBtn.addEventListener('click', stopVideo);
-
-    // When video ends, fade back to image (no loop)
-    heroVideo.addEventListener('ended', stopVideo);
 }
 
 function updateMuteIcon(btn, isMuted) {
