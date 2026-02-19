@@ -1130,6 +1130,174 @@ h4 {
 }
 
 /* =====================================================
+   LUXURY EXPERIENCE SECTION
+   ===================================================== */
+.experience-section {
+    position: relative;
+    padding: var(--space-5xl) 0;
+    background: url('https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1920') center/cover no-repeat fixed;
+    overflow: hidden;
+}
+
+.experience-bg {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(10, 10, 10, 0.94) 0%, rgba(15, 12, 5, 0.90) 50%, rgba(10, 10, 10, 0.94) 100%);
+    backdrop-filter: blur(2px);
+}
+
+.experience-container {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4xl);
+    align-items: center;
+}
+
+/* Left side - Quote */
+.experience-quote {
+    text-align: center;
+    padding: var(--space-3xl) var(--space-xl);
+}
+
+.experience-icon {
+    display: block;
+    font-size: 1.5rem;
+    color: var(--color-gold);
+    margin-bottom: var(--space-xl);
+    letter-spacing: 12px;
+    opacity: 0.6;
+}
+
+.experience-heading {
+    font-family: var(--font-heading);
+    font-size: clamp(1.6rem, 3vw, 2.4rem);
+    color: var(--color-white);
+    font-weight: 400;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin-bottom: var(--space-lg);
+    line-height: 1.4;
+}
+
+.experience-line {
+    width: 50px;
+    height: 1px;
+    background: var(--color-gold);
+    margin: 0 auto var(--space-xl);
+    position: relative;
+}
+
+.experience-line::before {
+    content: '✦';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: transparent;
+    padding: 0 14px;
+    font-size: 0.45rem;
+    color: var(--color-gold);
+}
+
+.experience-text {
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.50);
+    line-height: 2.2;
+    letter-spacing: 0.3px;
+    font-style: italic;
+    font-family: var(--font-heading);
+    max-width: 420px;
+    margin: 0 auto;
+}
+
+/* Right side - Feature Cards */
+.experience-features {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+}
+
+.experience-card {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-lg);
+    padding: var(--space-xl) var(--space-xl);
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(212, 175, 55, 0.08);
+    transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    position: relative;
+    overflow: hidden;
+}
+
+.experience-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 2px;
+    height: 0;
+    background: var(--gradient-gold);
+    transition: height 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.experience-card:hover::before {
+    height: 100%;
+}
+
+.experience-card:hover {
+    background: rgba(212, 175, 55, 0.04);
+    border-color: rgba(212, 175, 55, 0.15);
+    transform: translateX(6px);
+}
+
+.experience-card-icon {
+    width: 52px;
+    height: 52px;
+    border: 1px solid rgba(212, 175, 55, 0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: var(--transition);
+}
+
+.experience-card-icon i {
+    font-size: 1.1rem;
+    color: var(--color-gold);
+    opacity: 0.7;
+    transition: var(--transition);
+}
+
+.experience-card:hover .experience-card-icon {
+    background: var(--color-gold);
+    border-color: var(--color-gold);
+}
+
+.experience-card:hover .experience-card-icon i {
+    color: var(--color-dark);
+    opacity: 1;
+}
+
+.experience-card-content h3 {
+    font-family: var(--font-heading);
+    font-size: 0.95rem;
+    font-weight: 400;
+    color: var(--color-champagne);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+}
+
+.experience-card-content p {
+    font-size: 0.82rem;
+    color: rgba(255, 255, 255, 0.38);
+    line-height: 1.8;
+    letter-spacing: 0.2px;
+}
+
+/* =====================================================
    GALLERY SECTION - LUXURY
    ===================================================== */
 .gallery-section {
@@ -2618,6 +2786,56 @@ h4 {
 
     .menu-card-price {
         font-size: 1rem;
+    }
+
+    /* EXPERIENCE - Mobile */
+    .experience-section {
+        background-attachment: scroll !important;
+    }
+
+    .experience-container {
+        grid-template-columns: 1fr;
+        gap: var(--space-2xl);
+    }
+
+    .experience-quote {
+        padding: var(--space-xl) 0;
+    }
+
+    .experience-heading {
+        font-size: 1.4rem;
+        letter-spacing: 2px;
+    }
+
+    .experience-text {
+        font-size: 0.88rem;
+        line-height: 2;
+    }
+
+    .experience-card {
+        padding: var(--space-md);
+    }
+
+    .experience-card:hover {
+        transform: none;
+    }
+
+    .experience-card-icon {
+        width: 44px;
+        height: 44px;
+    }
+
+    .experience-card-icon i {
+        font-size: 0.95rem;
+    }
+
+    .experience-card-content h3 {
+        font-size: 0.85rem;
+        letter-spacing: 1px;
+    }
+
+    .experience-card-content p {
+        font-size: 0.78rem;
     }
 
     /* GALLERY - Mobile */
